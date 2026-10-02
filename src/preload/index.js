@@ -11,6 +11,7 @@ const api = {
     getLeaderboard: (limit) => ipcRenderer.invoke('db:getLeaderboard', limit),
     getLeaderboardSettings: () => ipcRenderer.invoke('db:getLeaderboardSettings'),
     getGameSettings: () => ipcRenderer.invoke('db:getGameSettings'),
+    pickGameForPlayer: () => ipcRenderer.invoke('db:pickGameForPlayer'),
     getPlayerRank: (phone) => ipcRenderer.invoke('db:getPlayerRank', phone),
     importLegacyUsers: (users) => ipcRenderer.invoke('db:importLegacyUsers', users)
   },

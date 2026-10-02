@@ -677,10 +677,27 @@ function Dashboard({ onExit, onSessionExpired }) {
       {gameSettings && (
         <div className="admin-leaderboard-control">
           <div className="admin-leaderboard-control-row">
+            <span className="admin-field-label">Random Game</span>
+            <button
+              type="button"
+              className={`admin-toggle ${gameSettings.randomScene ? 'admin-toggle-on' : ''}`}
+              disabled={savingSettings}
+              aria-pressed={gameSettings.randomScene}
+              onClick={() => updateGameSettings({ randomScene: !gameSettings.randomScene })}
+            >
+              <span className="admin-toggle-knob" />
+            </button>
+            <span className="admin-toggle-state">
+              {gameSettings.randomScene ? 'On — every new player gets a random game' : 'Off'}
+            </span>
+          </div>
+
+          <div className="admin-leaderboard-control-row">
             <span className="admin-field-label">Active Game</span>
             <Select
               className="admin-select"
-              disabled={savingSettings}
+              // random mode picks the scene per player, so the manual choice is locked meanwhile
+              disabled={savingSettings || gameSettings.randomScene}
               value={gameSettings.scene}
               options={GAME_SCENE_OPTIONS}
               onChange={(scene) => updateGameSettings({ scene })}

@@ -35,9 +35,10 @@ function App() {
 
   const handleAuth = async (authedUser) => {
     setUser(authedUser)
-    // picked fresh per visitor, so an admin's scene/timer change applies from the next sign-up on
+    // picked fresh per visitor, so an admin's scene/timer change applies from the next sign-up on,
+    // and in random mode each visitor gets their own randomly picked scene
     try {
-      const { scene, durationSeconds: adminDuration } = await window.api.db.getGameSettings()
+      const { scene, durationSeconds: adminDuration } = await window.api.db.pickGameForPlayer()
       setSceneId(scene)
       setDurationSeconds(adminDuration)
     } catch (err) {

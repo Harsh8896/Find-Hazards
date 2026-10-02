@@ -39,9 +39,12 @@ function validate(form) {
   else if (company.length < 2) errs.company = 'Company must be at least 2 characters'
   else if (company.length > 100) errs.company = 'Company must be under 100 characters'
 
-  if (designation.length > 50) errs.designation = 'Job title must be under 50 characters'
+  if (!designation) errs.designation = 'Job title is required'
+  else if (designation.length < 2) errs.designation = 'Job title must be at least 2 characters'
+  else if (designation.length > 50) errs.designation = 'Job title must be under 50 characters'
 
-  if (state.length > 50) errs.state = 'State must be under 50 characters'
+  if (!state) errs.state = 'State is required'
+  else if (state.length > 50) errs.state = 'State must be under 50 characters'
 
   if (!industry) errs.industry = 'Industry is required'
   else if (industry.length < 2) errs.industry = 'Industry must be at least 2 characters'

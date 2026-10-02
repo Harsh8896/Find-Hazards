@@ -5,6 +5,7 @@ import { GAME_DURATION_SECONDS } from '../data/hazards'
 import { calculateScore } from '../lib/scoring'
 import { OBJECTS, highlightFor, hitTest, idForKey, loadSceneMap } from '../lib/sceneMap'
 import { hitTestVector, vectorIdForKey } from '../lib/vectorHit'
+import { smoothClosedPath } from '../lib/smoothPath'
 
 const TOAST_MS = 1800
 
@@ -311,7 +312,23 @@ function Highlight({ id, tone }) {
 function VectorHighlight({ scene, id, tone }) {
   const obj = scene.vectorObjects.find((o) => o.id === id)
   if (!obj) return null
-  const d = obj.points.map(([x, y], i) => `${i === 0 ? 'M' : 'L'}${x} ${y}`).join(' ') + ' Z'
+  if (obj.mask) {
+    const { src, x, y, w, h } = obj.mask
+    return (
+      <div
+        className={`vector-mask-glow vector-mask-${tone}`}
+        style={{
+          left: `${(x / scene.imageWidth) * 100}%`,
+          top: `${(y / scene.imageHeight) * 100}%`,
+          width: `${(w / scene.imageWidth) * 100}%`,
+          height: `${(h / scene.imageHeight) * 100}%`,
+          WebkitMaskImage: `url(${src})`,
+          maskImage: `url(${src})`
+        }}
+      />
+    )
+  }
+  const d = smoothClosedPath(obj.points)
   return (
     <svg
       className="vector-glow-svg"

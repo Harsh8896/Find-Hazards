@@ -11,10 +11,18 @@ export const HAZARDS = [
     label: 'Forklift and Pedestrian Conflict',
     keys: ['pedestrian-forklift-cement', 'forklift-cement']
   },
-  { num: 6, label: 'Open Electrical Panel: Shock Exposure', keys: ['open-electrical-panel-cement'] },
-  { num: 7, label: 'Hot Work Close to Gas Cylinders', keys: ['hot-work-cement', 'gas-cylinders-cement'] },
+  {
+    num: 6,
+    label: 'Open Electrical Panel: Shock Exposure',
+    keys: ['open-electrical-panel-cement']
+  },
+  {
+    num: 7,
+    label: 'Hot Work Close to Gas Cylinders',
+    keys: ['hot-work-cement', 'gas-cylinders-cement']
+  },
   { num: 8, label: 'Trailing Hose: Trip Hazard', keys: ['trailing-hose-cement'] },
-  { num: 9, label: 'Blocked Emergency Exit', keys: ['blocked-exit-cement'] },
+  { num: 9, label: 'Blocked Emergency Exit', keys: ['blocked-exit-cement', 'exit-sign-cement'] },
   { num: 10, label: 'Poor Lifting Posture: Back Injury', keys: ['poor-lifting-posture-cement'] }
 ]
 

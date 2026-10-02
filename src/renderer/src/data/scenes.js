@@ -11,8 +11,7 @@ import {
 } from './hazards'
 
 import pharmaSceneUrl from '../assets/scenes/pharma/scene.webp'
-import pharmaLabelsUrl from '../assets/scenes/pharma/scene-labels.png'
-import pharmaObjectList from './scenes/pharma/scene-objects.json'
+import { VECTOR_OBJECTS as pharmaVectorObjects } from './scenes/pharma/vector-objects'
 import {
   HAZARDS as pharmaHazards,
   hazardByNum as pharmaHazardByNum,
@@ -20,8 +19,7 @@ import {
 } from './scenes/pharma/hazards'
 
 import chemicalSceneUrl from '../assets/scenes/chemical/scene.webp'
-import chemicalLabelsUrl from '../assets/scenes/chemical/scene-labels.png'
-import chemicalObjectList from './scenes/chemical/scene-objects.json'
+import { VECTOR_OBJECTS as chemicalVectorObjects } from './scenes/chemical/vector-objects'
 import {
   HAZARDS as chemicalHazards,
   hazardByNum as chemicalHazardByNum,
@@ -48,14 +46,6 @@ const warehouseImages = import.meta.glob('../assets/objects/*.png', {
   eager: true,
   import: 'default'
 })
-const pharmaImages = import.meta.glob('../assets/scenes/pharma/objects/*.png', {
-  eager: true,
-  import: 'default'
-})
-const chemicalImages = import.meta.glob('../assets/scenes/chemical/objects/*.png', {
-  eager: true,
-  import: 'default'
-})
 
 export const SCENES = {
   warehouse: {
@@ -72,10 +62,12 @@ export const SCENES = {
   pharma: {
     id: 'pharma',
     label: 'Pharma Industry',
+    // vector scene with per-object pixel masks, same technique as automotive below
+    kind: 'vector',
     sceneUrl: pharmaSceneUrl,
-    labelsUrl: pharmaLabelsUrl,
-    objectList: pharmaObjectList,
-    imageFor: (key) => pharmaImages[`../assets/scenes/pharma/objects/${key}.png`],
+    imageWidth: 3006,
+    imageHeight: 1704,
+    vectorObjects: pharmaVectorObjects,
     HAZARDS: pharmaHazards,
     hazardByNum: pharmaHazardByNum,
     hazardForKey: pharmaHazardForKey
@@ -83,10 +75,12 @@ export const SCENES = {
   chemical: {
     id: 'chemical',
     label: 'Chemical Industry',
+    // vector scene with per-object pixel masks, same technique as automotive below
+    kind: 'vector',
     sceneUrl: chemicalSceneUrl,
-    labelsUrl: chemicalLabelsUrl,
-    objectList: chemicalObjectList,
-    imageFor: (key) => chemicalImages[`../assets/scenes/chemical/objects/${key}.png`],
+    imageWidth: 1448,
+    imageHeight: 850,
+    vectorObjects: chemicalVectorObjects,
     HAZARDS: chemicalHazards,
     hazardByNum: chemicalHazardByNum,
     hazardForKey: chemicalHazardForKey

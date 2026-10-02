@@ -586,7 +586,7 @@ export function getGameSettings() {
   const rows = db
     .prepare(
       `SELECT key, value FROM settings
-       WHERE key IN ('active_scene', 'game_duration_seconds', 'active_event')`
+       WHERE key IN ('active_scene', 'game_duration_seconds', 'active_event', 'random_scene')`
     )
     .all()
   const byKey = Object.fromEntries(rows.map((r) => [r.key, r.value]))
@@ -605,10 +605,22 @@ export function getGameSettings() {
     byKey.active_event && db.prepare('SELECT 1 FROM events WHERE name = ?').get(byKey.active_event)
       ? byKey.active_event
       : ''
-  return { scene, durationSeconds, activeEvent }
+  // random mode: every new sign-up gets a randomly picked scene instead of `scene`
+  const randomScene = byKey.random_scene === '1'
+  return { scene, durationSeconds, activeEvent, randomScene }
 }
 
-export function updateGameSettings({ scene, durationSeconds, event }) {
+// The scene and timer for the visitor who just signed up: the admin's chosen scene, or a random
+// one from every available scene while random mode is on.
+export function pickGameForPlayer() {
+  const settings = getGameSettings()
+  const scene = settings.randomScene
+    ? GAME_SCENES[Math.floor(Math.random() * GAME_SCENES.length)]
+    : settings.scene
+  return { scene, durationSeconds: settings.durationSeconds }
+}
+
+export function updateGameSettings({ scene, durationSeconds, event, randomScene }) {
   const current = getGameSettings()
   const parsedDuration = Number.parseInt(durationSeconds, 10)
   const eventExists =
@@ -622,7 +634,8 @@ export function updateGameSettings({ scene, durationSeconds, event }) {
       parsedDuration <= MAX_DURATION_SECONDS
         ? parsedDuration
         : current.durationSeconds,
-    activeEvent: eventExists ? event : current.activeEvent
+    activeEvent: eventExists ? event : current.activeEvent,
+    randomScene: typeof randomScene === 'boolean' ? randomScene : current.randomScene
   }
   const upsert = db.prepare(
     `INSERT INTO settings (key, value) VALUES (@key, @value)
@@ -632,6 +645,7 @@ export function updateGameSettings({ scene, durationSeconds, event }) {
     upsert.run({ key: 'active_scene', value: next.scene })
     upsert.run({ key: 'game_duration_seconds', value: String(next.durationSeconds) })
     upsert.run({ key: 'active_event', value: next.activeEvent })
+    upsert.run({ key: 'random_scene', value: next.randomScene ? '1' : '0' })
   })()
   return next
 }

@@ -46,6 +46,8 @@ function registerDbHandlers() {
   handle('db:getLeaderboardSettings', () => db.getLeaderboardSettings())
   // public: every kiosk screen needs to know which scene to play before anyone is signed in
   handle('db:getGameSettings', () => db.getGameSettings())
+  // public: the scene + timer for a visitor who just signed up (random scene in random mode)
+  handle('db:pickGameForPlayer', () => db.pickGameForPlayer())
   handle('db:getPlayerRank', (_, phone) => db.getPlayerRank(phone))
   handle('db:importLegacyUsers', (_, users) => db.importLegacyUsers(users))
   registerAdminHandlers(handle)

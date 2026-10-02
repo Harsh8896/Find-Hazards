@@ -682,24 +682,58 @@ body {
 
 .vector-glow {
   animation: seg-in 380ms ease-out both;
+  stroke-linejoin: round;
+  stroke-linecap: round;
 }
 
 .vector-glow-good {
-  fill: rgba(46, 204, 113, 0.55);
-  stroke: rgba(74, 255, 140, 0.9);
-  stroke-width: 3;
+  fill: rgba(46, 204, 113, 0.5);
+  stroke: rgba(74, 255, 140, 0.95);
+  stroke-width: 2.5;
+  filter: drop-shadow(0 0 3px rgba(74, 255, 140, 0.85));
 }
 
 .vector-glow-bad {
-  fill: rgba(220, 50, 50, 0.5);
-  stroke: rgba(255, 60, 60, 0.9);
-  stroke-width: 3;
+  fill: rgba(220, 50, 50, 0.45);
+  stroke: rgba(255, 60, 60, 0.95);
+  stroke-width: 2.5;
+  filter: drop-shadow(0 0 3px rgba(255, 60, 60, 0.85));
 }
 
 .vector-glow-debug {
   fill: rgba(255, 230, 0, 0.35);
   stroke: rgba(255, 230, 0, 0.9);
   stroke-width: 2;
+  stroke-linejoin: round;
+  opacity: 0.6;
+  animation: none;
+}
+
+/* Pixel-mask vector highlight (see vector-objects.js `mask`): a real alpha cut-out of the
+   object's silhouette, not a polygon fill, so pixels outside the traced shape stay untinted
+   even where the polygon's straight edges would have covered background. */
+.vector-mask-glow {
+  position: absolute;
+  pointer-events: none;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+  animation: seg-in 380ms ease-out both;
+}
+
+.vector-mask-good {
+  background: rgba(46, 204, 113, 0.40);
+  filter: drop-shadow(0 0 3px rgba(74, 255, 140, 0.8));
+}
+
+.vector-mask-bad {
+  background: rgba(220, 50, 50, 0.32);
+  filter: drop-shadow(0 0 3px rgba(255, 60, 60, 0.8));
+}
+
+.vector-mask-debug {
+  background: rgba(255, 230, 0, 0.45);
   opacity: 0.6;
   animation: none;
 }
