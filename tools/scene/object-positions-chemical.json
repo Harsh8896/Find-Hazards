@@ -1,0 +1,102 @@
+{
+ "blocked-emergency-shower": {
+  "x": 1187,
+  "y": 409,
+  "score": 0.838
+ },
+ "chemical-bags-stacking": {
+  "x": 1332,
+  "y": 780,
+  "score": 0.591
+ },
+ "chemical-room-storage": {
+  "x": 980,
+  "y": 430,
+  "score": 0.875
+ },
+ "chemical-spill-floor": {
+  "x": 266,
+  "y": 670,
+  "score": 0.61
+ },
+ "chemical-transfer-leak": {
+  "x": 85,
+  "y": 486,
+  "score": 0.339
+ },
+ "electrical-hazard-water": {
+  "x": 1046,
+  "y": 840,
+  "score": 0.775
+ },
+ "forklift-chemical": {
+  "x": 731,
+  "y": 468,
+  "score": 0.74
+ },
+ "hazardous-fumes-release": {
+  "x": 679,
+  "y": 142,
+  "score": 0.719
+ },
+ "height-worker-chemical": {
+  "x": 130,
+  "y": 140,
+  "score": 0.399
+ },
+ "hot-work-activity": {
+  "x": 1228,
+  "y": 576,
+  "score": 0.715
+ },
+ "improper-chemical-storage": {
+  "x": 516,
+  "y": 451,
+  "score": 0.682
+ },
+ "inadequate-ppe-chemical": {
+  "x": 434,
+  "y": 492,
+  "score": 0.387
+ },
+ "leaking-drum": {
+  "x": 642,
+  "y": 670,
+  "score": 0.663
+ },
+ "loose-pallet": {
+  "x": 775,
+  "y": 833,
+  "score": 0.66
+ },
+ "open-floor-drain-chemical": {
+  "x": 337,
+  "y": 855,
+  "score": 0.66
+ },
+ "poor-manual-handling-chemical": {
+  "x": 886,
+  "y": 569,
+  "score": 0.731
+ },
+ "trailing-cables-chemical": {
+  "x": 770,
+  "y": 881,
+  "score": 0.761
+ },
+ "unsecured-gas-cylinder": {
+  "x": 0,
+  "y": 736,
+  "score": 0.599
+ },
+ "unsecured-tank-access": {
+  "x": 476,
+  "y": 257,
+  "score": 0.805
+ },
+ "workbench-tools-chemical": {
+  "x": 1075,
+  "y": 785,
+  "score": 0.687
+ }
+}

@@ -1,0 +1,182 @@
+{
+ "blocked-exit": {
+  "x": 272,
+  "y": 918,
+  "score": 0.787
+ },
+ "delivery-truck": {
+  "x": 1915,
+  "y": 1231,
+  "score": 0.818
+ },
+ "electrical-panels": {
+  "x": 1636,
+  "y": 697,
+  "score": 0.796
+ },
+ "fire-extinguisher": {
+  "x": 59,
+  "y": 936,
+  "score": 0.87
+ },
+ "forklift": {
+  "x": 1662,
+  "y": 970,
+  "score": 0.721
+ },
+ "gas-cylinder": {
+  "x": 1626,
+  "y": 317,
+  "score": 0.89
+ },
+ "leaking-drums": {
+  "x": 76,
+  "y": 1144,
+  "score": 0.682
+ },
+ "leaking-pump": {
+  "x": 1237,
+  "y": 668,
+  "score": 0.805
+ },
+ "left-boxes": {
+  "x": 97,
+  "y": 902,
+  "score": 0.771
+ },
+ "left-warehouse": {
+  "x": 2,
+  "y": 514,
+  "score": 0.569
+ },
+ "loose-hose": {
+  "x": 572,
+  "y": 650,
+  "score": 0.512
+ },
+ "oil-spill": {
+  "x": 1108,
+  "y": 872,
+  "score": 0.604
+ },
+ "oily-footprints": {
+  "x": 993,
+  "y": 928,
+  "score": 0.917
+ },
+ "open-manhole": {
+  "x": 1076,
+  "y": 1079,
+  "score": 0.828
+ },
+ "pipe-rack": {
+  "x": 1408,
+  "y": 14,
+  "score": 0.727
+ },
+ "platform-drums": {
+  "x": 2321,
+  "y": 565,
+  "score": 0.73
+ },
+ "platform-hose": {
+  "x": 2187,
+  "y": 595,
+  "score": 0.695
+ },
+ "pump-skid": {
+  "x": 587,
+  "y": 928,
+  "score": 0.778
+ },
+ "refinery-unit": {
+  "x": 2,
+  "y": 13,
+  "score": 0.683
+ },
+ "right-warehouse": {
+  "x": 1731,
+  "y": 454,
+  "score": 0.388
+ },
+ "safety-sign": {
+  "x": 2250,
+  "y": 1003,
+  "score": 0.84
+ },
+ "scaffold-worker": {
+  "x": 1425,
+  "y": 200,
+  "score": 0.76
+ },
+ "scaffolding": {
+  "x": 1327,
+  "y": 136,
+  "score": 0.611
+ },
+ "smoking-worker": {
+  "x": 932,
+  "y": 452,
+  "score": 0.915
+ },
+ "spill-kit": {
+  "x": 1785,
+  "y": 733,
+  "score": 0.87
+ },
+ "standing-worker": {
+  "x": 2168,
+  "y": 411,
+  "score": 0.835
+ },
+ "storage-tanks": {
+  "x": 656,
+  "y": 14,
+  "score": 0.787
+ },
+ "talking-worker": {
+  "x": 1129,
+  "y": 450,
+  "score": 0.884
+ },
+ "tanker-truck": {
+  "x": 1966,
+  "y": 206,
+  "score": 0.786
+ },
+ "trees": {
+  "x": 847,
+  "y": 1183,
+  "score": 0.741
+ },
+ "tripping-worker": {
+  "x": 702,
+  "y": 727,
+  "score": 0.736
+ },
+ "truck-top-worker": {
+  "x": 2044,
+  "y": 125,
+  "score": 0.802
+ },
+ "unsecured-ladder": {
+  "x": 444,
+  "y": 366,
+  "score": 0.627
+ },
+ "valve-manifold": {
+  "x": 356,
+  "y": 775,
+  "score": 0.828
+ },
+ "warehouse-boxes": {
+  "x": 1964,
+  "y": 848,
+  "score": 0.75
+ },
+ "zebra-crossing": {
+  "x": 1392,
+  "y": 1110,
+  "score": 0.551
+ }
+}

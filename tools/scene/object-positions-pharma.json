@@ -1,0 +1,142 @@
+{
+ "blocked-emergency-exit": {
+  "x": 2531,
+  "y": 180,
+  "score": null
+ },
+ "ceiling-ac-vent-1": {
+  "x": 1322,
+  "y": 106,
+  "score": null
+ },
+ "chemical-storage-drums": {
+  "x": 1735,
+  "y": 264,
+  "score": null
+ },
+ "control-box-cart": {
+  "x": 1304,
+  "y": 712,
+  "score": null
+ },
+ "dust-exposure-worker": {
+  "x": 100,
+  "y": 750,
+  "score": null
+ },
+ "electrical-cable-floor": {
+  "x": 331,
+  "y": 1621,
+  "score": null
+ },
+ "ergonomic-stool": {
+  "x": 2564,
+  "y": 1412,
+  "score": null
+ },
+ "fire-extinguisher-obstructed": {
+  "x": 2734,
+  "y": 1033,
+  "score": null
+ },
+ "flammable-cabinet": {
+  "x": 2834,
+  "y": 173,
+  "score": null
+ },
+ "forklift-pharma": {
+  "x": 2082,
+  "y": 458,
+  "score": null
+ },
+ "hand-protection-worker": {
+  "x": 1901,
+  "y": 937,
+  "score": null
+ },
+ "height-worker-pharma": {
+  "x": 100,
+  "y": 0,
+  "score": null
+ },
+ "manual-handling-container": {
+  "x": 1230,
+  "y": 530,
+  "score": null
+ },
+ "obstructed-walkway": {
+  "x": 34,
+  "y": 1254,
+  "score": null
+ },
+ "open-unstable-cabinet": {
+  "x": 2764,
+  "y": 761,
+  "score": null
+ },
+ "overfilled-waste-bin": {
+  "x": 2017,
+  "y": 1375,
+  "score": null
+ },
+ "overhead-pipe-rack": {
+  "x": 278,
+  "y": 72,
+  "score": null
+ },
+ "packing-conveyor-bottles": {
+  "x": 1674,
+  "y": 855,
+  "score": null
+ },
+ "poor-manual-handling-posture": {
+  "x": 791,
+  "y": 1126,
+  "score": null
+ },
+ "powder-spill-floor": {
+  "x": 663,
+  "y": 1236,
+  "score": null
+ },
+ "ppe-operator-panel": {
+  "x": 780,
+  "y": 600,
+  "score": null
+ },
+ "reactor-vessels-farleft": {
+  "x": 21,
+  "y": 511,
+  "score": null
+ },
+ "reactor-vessels-left": {
+  "x": 288,
+  "y": 360,
+  "score": null
+ },
+ "reactor-vessels-right": {
+  "x": 721,
+  "y": 329,
+  "score": null
+ },
+ "trailing-cables-pharma": {
+  "x": 826,
+  "y": 1491,
+  "score": null
+ },
+ "wet-floor-sign": {
+  "x": 1330,
+  "y": 1187,
+  "score": null
+ },
+ "wheeled-waste-bin": {
+  "x": 199,
+  "y": 980,
+  "score": null
+ },
+ "worktable-tools": {
+  "x": 1986,
+  "y": 1190,
+  "score": null
+ }
+}
