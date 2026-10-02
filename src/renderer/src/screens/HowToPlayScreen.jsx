@@ -1,8 +1,8 @@
-import { GAME_DURATION_SECONDS, HAZARDS, POINTS_CORRECT, POINTS_WRONG } from '../data/hazards'
+import { GAME_DURATION_SECONDS, POINTS_CORRECT, POINTS_WRONG } from '../data/hazards'
 import { LEADERBOARD_SIZE } from '../lib/leaderboard'
 
-export default function HowToPlayScreen({ durationSeconds, onStart, onBack }) {
-  const total = HAZARDS.length
+export default function HowToPlayScreen({ durationSeconds, totalHazards, onStart, onBack }) {
+  const total = totalHazards
 
   const tiles = [
     { value: durationSeconds ?? GAME_DURATION_SECONDS, label: 'Seconds', tone: 'dark' },
@@ -13,7 +13,7 @@ export default function HowToPlayScreen({ durationSeconds, onStart, onBack }) {
 
   const rules = [
     'Tap every hazard you can spot in the workplace scene.',
-    'A correct tap lights the hazard up green. A wrong tap turns that whole object red — tapping it again costs nothing.',
+    'A correct tap lights the hazard up green. A wrong tap is marked red — tapping the same spot again costs nothing.',
     `You get one tap per hazard — ${total} hazards, ${total} taps. Tap carefully.`,
     'Tapping a hazard you already found does not count and does not use a tap.',
     'Finish fast to earn a speed bonus — press Submit when you are done.',

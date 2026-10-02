@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import AuthScreen from './screens/AuthScreen'
+import IntroScreen from './screens/IntroScreen'
 import HowToPlayScreen from './screens/HowToPlayScreen'
 import GameScreen from './screens/GameScreen'
 import ResultScreen from './screens/ResultScreen'
@@ -13,7 +14,7 @@ import { GAME_DURATION_SECONDS } from './data/hazards'
 
 function App() {
   const [isLeaderboard, setIsLeaderboard] = useState(() => window.location.hash === '#leaderboard')
-  const [stage, setStage] = useState('auth') // 'auth' | 'howto' | 'game' | 'result' | 'leaderboard' | 'admin'
+  const [stage, setStage] = useState('auth') // 'auth' | 'intro' | 'howto' | 'game' | 'result' | 'leaderboard' | 'admin'
   const [user, setUser] = useState(null)
   const [result, setResult] = useState(null)
   const [sceneId, setSceneId] = useState(DEFAULT_SCENE_ID) // which hazard-spotting game is active
@@ -42,7 +43,7 @@ function App() {
     } catch (err) {
       console.error('Could not load game settings, using the defaults', err)
     }
-    setStage('howto')
+    setStage('intro')
   }
 
   const handleFinish = async (gameResult) => {
@@ -92,9 +93,17 @@ function App() {
           onAdmin={() => setStage('admin')}
         />
       )}
+      {stage === 'intro' && (
+        <IntroScreen
+          scene={sceneFor(sceneId)}
+          durationSeconds={durationSeconds}
+          onStart={() => setStage('howto')}
+        />
+      )}
       {stage === 'howto' && (
         <HowToPlayScreen
           durationSeconds={durationSeconds}
+          totalHazards={sceneFor(sceneId).HAZARDS.length}
           onStart={() => setStage('game')}
           onBack={handleLogout}
         />

@@ -36,6 +36,14 @@ import {
   hazardForKey as automotiveHazardForKey
 } from './scenes/automotive/hazards'
 
+import cementSceneUrl from '../assets/Cement-Industry.png'
+import { VECTOR_OBJECTS as cementVectorObjects } from './scenes/cement/vector-objects'
+import {
+  HAZARDS as cementHazards,
+  hazardByNum as cementHazardByNum,
+  hazardForKey as cementHazardForKey
+} from './scenes/cement/hazards'
+
 const warehouseImages = import.meta.glob('../assets/objects/*.png', {
   eager: true,
   import: 'default'
@@ -96,6 +104,20 @@ export const SCENES = {
     HAZARDS: automotiveHazards,
     hazardByNum: automotiveHazardByNum,
     hazardForKey: automotiveHazardForKey
+  },
+  cement: {
+    id: 'cement',
+    label: 'Cement Industry',
+    // The source poster contains a header and PPE footer; cover-crop to the central scene.
+    kind: 'vector',
+    imageFit: 'cover',
+    sceneUrl: cementSceneUrl,
+    imageWidth: 1448,
+    imageHeight: 822,
+    vectorObjects: cementVectorObjects,
+    HAZARDS: cementHazards,
+    hazardByNum: cementHazardByNum,
+    hazardForKey: cementHazardForKey
   }
 }
 

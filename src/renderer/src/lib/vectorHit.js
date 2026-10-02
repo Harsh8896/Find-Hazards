@@ -15,10 +15,40 @@ function pointInPolygon(x, y, points) {
 }
 
 // What did a tap at (fx, fy) — fractions of the scene's width/height — land on?
-export function hitTestVector(scene, fx, fy) {
+function distanceToPolygonSquared(x, y, points) {
+  let closest = Infinity
+  for (let i = 0; i < points.length; i++) {
+    const [ax, ay] = points[i]
+    const [bx, by] = points[(i + 1) % points.length]
+    const dx = bx - ax
+    const dy = by - ay
+    const lengthSquared = dx * dx + dy * dy
+    const t = lengthSquared ? Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / lengthSquared)) : 0
+    const px = ax + t * dx
+    const py = ay + t * dy
+    const distanceSquared = (x - px) ** 2 + (y - py) ** 2
+    if (distanceSquared < closest) closest = distanceSquared
+  }
+  return closest
+}
+
+export function hitTestVector(scene, fx, fy, tolerancePx = 0) {
   const x = fx * scene.imageWidth
   const y = fy * scene.imageHeight
-  return scene.vectorObjects.find((o) => pointInPolygon(x, y, o.points)) || null
+  const inside = scene.vectorObjects.find((o) => pointInPolygon(x, y, o.points))
+  if (inside || tolerancePx <= 0) return inside || null
+
+  let closest = null
+  let closestDistanceSquared = 0
+  for (const object of scene.vectorObjects) {
+    const distanceSquared = distanceToPolygonSquared(x, y, object.points)
+    const objectTolerance = Math.max(tolerancePx, object.hitPaddingPx || 0)
+    if (distanceSquared <= objectTolerance * objectTolerance && (!closest || distanceSquared < closestDistanceSquared)) {
+      closest = object
+      closestDistanceSquared = distanceSquared
+    }
+  }
+  return closest
 }
 
 export const vectorIdForKey = (scene, key) => scene.vectorObjects.find((o) => o.key === key)?.id

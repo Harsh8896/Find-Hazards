@@ -235,7 +235,7 @@ function migrateToV3() {
   }
 }
 
-// v4 records which scene (warehouse/pharma/chemical/automotive) each game was played on, so the
+// v4 records which scene (warehouse/pharma/chemical/automotive/cement) each game was played on, so the
 // admin "All Players" table can show it. Games played before this migration have no way to know
 // their scene, so they're left blank ('').
 function migrateToV4() {
@@ -553,7 +553,7 @@ export function updateLeaderboardSettings({ visible, mode, date, windowEnabled }
 // ---------- Game (active scene + timer) settings ----------
 // Which hazard-spotting scene the kiosk is currently running, and how long a round lasts.
 // Admin-controlled, kept in the same settings key/value table as the leaderboard settings.
-const GAME_SCENES = ['warehouse', 'pharma', 'chemical', 'automotive']
+const GAME_SCENES = ['warehouse', 'pharma', 'chemical', 'automotive', 'cement']
 const MIN_DURATION_SECONDS = 30
 const MAX_DURATION_SECONDS = 600
 const DEFAULT_GAME_SETTINGS = () => ({ scene: 'warehouse', durationSeconds: 120 })

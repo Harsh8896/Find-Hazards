@@ -17,6 +17,7 @@ export default function GameScreen({ scene, durationSeconds, onFinish }) {
   const [loadError, setLoadError] = useState(null)
   const [timeLeft, setTimeLeft] = useState(roundSeconds)
   const [found, setFound] = useState(() => new Set()) // hazard numbers found
+  const [foundVectorIds, setFoundVectorIds] = useState(() => new Set()) // vector shapes actually tapped
   const [wrongTaps, setWrongTaps] = useState([]) // { objectId | null, x, y } per wrong tap
   const [toast, setToast] = useState(null) // { key, text }
   const [phase, setPhase] = useState('playing') // 'playing' | 'reveal'
@@ -88,7 +89,7 @@ export default function GameScreen({ scene, durationSeconds, onFinish }) {
     // tolerance scales with how big the scene is drawn: ~12 screen pixels
     const hit =
       scene.kind === 'vector'
-        ? hitTestVector(scene, fx, fy)
+        ? hitTestVector(scene, fx, fy, Math.round(12 * (imgRef.current.naturalWidth / rect.width)))
         : hitTest(fx, fy, Math.round(12 * (imgRef.current.naturalWidth / rect.width)))
 
     if (hit?.kind === 'hazard') {
@@ -96,6 +97,7 @@ export default function GameScreen({ scene, durationSeconds, onFinish }) {
       const hazard = hazardForKey.get(hit.key)
       if (!hazard || found.has(hazard.num)) return
       setFound((prev) => new Set(prev).add(hazard.num))
+      if (scene.kind === 'vector') setFoundVectorIds((prev) => new Set(prev).add(hit.id))
       setToast({ key: ++tapKey.current, text: hazard.label })
       playSound(correctRef)
       return
@@ -134,8 +136,11 @@ export default function GameScreen({ scene, durationSeconds, onFinish }) {
 
   const isVector = scene.kind === 'vector'
   const keyToId = isVector ? (key) => vectorIdForKey(scene, key) : idForKey
-  // every cut-out of a found hazard lights up (e.g. both workers without PPE)
-  const foundIds = [...found].flatMap((num) => hazardByNum.get(num).keys.map(keyToId))
+  // Raster hazards can span multiple designer cut-outs; vector scenes highlight only the
+  // precise polygon that was tapped, even when multiple polygons belong to one hazard.
+  const foundIds = isVector
+    ? [...foundVectorIds]
+    : [...found].flatMap((num) => hazardByNum.get(num).keys.map(keyToId))
   const debugIds = debug
     ? isVector
       ? scene.vectorObjects
@@ -217,6 +222,7 @@ export default function GameScreen({ scene, durationSeconds, onFinish }) {
           src={scene.sceneUrl}
           alt="Workplace scene: spot the hazards"
           className="board-img"
+          style={scene.imageFit ? { objectFit: scene.imageFit } : undefined}
           onClick={handleTap}
           onLoad={() => isVector && setReady(true)}
           draggable={false}

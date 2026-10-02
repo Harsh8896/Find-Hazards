@@ -161,6 +161,245 @@ body {
   background: rgba(255, 255, 255, 0.16);
 }
 
+/* ---------- Pre-game intro ---------- */
+.intro-screen {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  align-items: stretch;
+  justify-content: stretch;
+  padding: 36px clamp(28px, 4vw, 64px) 24px;
+  color: #fff;
+  background: #08090b;
+}
+
+.intro-backdrop,
+.intro-shade {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+}
+
+.intro-backdrop {
+  background-position: center;
+  background-size: cover;
+  filter: saturate(0.75) brightness(0.56);
+  transform: scale(1.025);
+}
+
+.intro-shade {
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(5, 6, 8, 0.97) 0%, rgba(5, 6, 8, 0.86) 38%, rgba(5, 6, 8, 0.35) 100%),
+    linear-gradient(0deg, rgba(5, 6, 8, 0.78), transparent 28%, transparent 72%, rgba(5, 6, 8, 0.38));
+}
+
+.intro-brand {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-self: flex-start;
+  line-height: 0.86;
+  text-transform: uppercase;
+  font-style: italic;
+}
+
+.intro-brand-name {
+  font-size: clamp(34px, 3.6vw, 54px);
+  font-weight: 1000;
+  letter-spacing: -3px;
+}
+
+.intro-brand-sub {
+  margin-top: 7px;
+  color: var(--pip-red);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 1.1px;
+}
+
+.intro-content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr);
+  align-items: center;
+  gap: clamp(24px, 5vw, 84px);
+  width: min(1280px, 100%);
+  flex: 1;
+  margin: 0 auto;
+  padding: 8px 0 24px;
+}
+
+.intro-copy {
+  max-width: 720px;
+}
+
+.intro-eyebrow {
+  margin-bottom: 16px;
+  color: #ffcf42;
+  font-size: clamp(13px, 1.2vw, 17px);
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.intro-count {
+  margin-bottom: 14px;
+  color: rgba(255, 255, 255, 0.94);
+  font-size: clamp(20px, 2vw, 29px);
+  font-weight: 600;
+}
+
+.intro-title {
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+  font-size: clamp(64px, 9.6vw, 138px);
+  font-style: italic;
+  font-weight: 1000;
+  letter-spacing: -0.065em;
+  line-height: 0.82;
+  text-transform: uppercase;
+}
+
+.intro-title strong {
+  color: var(--pip-red);
+  font-weight: 1000;
+}
+
+.intro-prompt {
+  margin-top: 20px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: clamp(18px, 1.85vw, 26px);
+}
+
+.intro-prompt strong {
+  color: #fff;
+  font-weight: 800;
+}
+
+.intro-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 22px;
+  margin-top: 28px;
+  padding: 17px 28px 17px 34px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--pip-red);
+  box-shadow: 0 12px 32px rgba(226, 35, 26, 0.28);
+  color: #fff;
+  cursor: pointer;
+  font-size: clamp(18px, 2vw, 27px);
+  font-style: italic;
+  font-weight: 900;
+  text-transform: uppercase;
+  transition: transform 150ms ease, background-color 150ms ease, box-shadow 150ms ease;
+}
+
+.intro-cta:hover {
+  transform: translateY(-2px);
+  background: #ff3025;
+  box-shadow: 0 16px 38px rgba(226, 35, 26, 0.4);
+}
+
+.intro-cta:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 4px;
+}
+
+.intro-arrows {
+  font-size: 1.3em;
+  letter-spacing: -0.2em;
+  line-height: 1;
+}
+
+.intro-hint {
+  margin-top: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+}
+
+.intro-lens-wrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(36vw, 470px);
+  aspect-ratio: 1;
+  justify-self: center;
+}
+
+.intro-lens {
+  position: relative;
+  z-index: 1;
+  width: 88%;
+  height: 88%;
+  overflow: hidden;
+  border: 10px solid rgba(35, 37, 40, 0.98);
+  border-radius: 50%;
+  background: #f5f5f5;
+  box-shadow: 0 0 0 5px var(--pip-red), 0 18px 50px rgba(0, 0, 0, 0.55);
+}
+
+.intro-lens img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 52% 45%;
+  transform: scale(1.65);
+}
+
+.intro-lens-handle {
+  position: absolute;
+  right: 0;
+  bottom: 1%;
+  width: 32%;
+  height: 12%;
+  border: 5px solid rgba(35, 37, 40, 0.98);
+  border-radius: 999px;
+  background: repeating-linear-gradient(135deg, #ed211a 0 26px, #c91914 26px 42px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+  transform: rotate(48deg);
+}
+
+.intro-footer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(1280px, 100%);
+  margin: 0 auto;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 14px;
+}
+
+.intro-footer-stripes {
+  color: #ffcf42;
+  font-size: 24px;
+  font-weight: 1000;
+  letter-spacing: -6px;
+}
+
+.intro-footer-stat {
+  margin-left: auto;
+  color: #fff;
+  font-weight: 700;
+}
+
+.intro-footer-stat i {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin: 0 10px 2px;
+  border-radius: 50%;
+  background: var(--pip-red);
+}
+
 /* ---------- How to play ---------- */
 .howto-screen {
   background: linear-gradient(160deg, #1a1a20 0%, var(--pip-black) 100%);
@@ -2207,5 +2446,92 @@ body {
 
   .signup-footer {
     margin-top: 12px;
+  }
+}
+
+@media (max-width: 850px) {
+  .intro-screen {
+    padding: 24px 28px 18px;
+  }
+
+  .intro-content {
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 0.7fr);
+    gap: 20px;
+  }
+
+  .intro-title {
+    font-size: clamp(58px, 10vw, 88px);
+  }
+
+  .intro-lens-wrap {
+    width: min(36vw, 320px);
+  }
+}
+
+@media (max-width: 620px) {
+  .intro-screen {
+    padding: 24px 22px 16px;
+  }
+
+  .intro-shade {
+    background: linear-gradient(90deg, rgba(5, 6, 8, 0.94), rgba(5, 6, 8, 0.68));
+  }
+
+  .intro-content {
+    display: flex;
+    align-items: center;
+    padding: 24px 0;
+  }
+
+  .intro-lens-wrap {
+    display: none;
+  }
+
+  .intro-title {
+    font-size: clamp(58px, 16vw, 88px);
+  }
+
+  .intro-footer {
+    flex-wrap: wrap;
+    font-size: 12px;
+  }
+
+  .intro-footer-stat {
+    width: 100%;
+    margin-left: 34px;
+  }
+}
+
+@media (max-height: 700px) {
+  .intro-screen {
+    padding-top: 18px;
+    padding-bottom: 14px;
+  }
+
+  .intro-content {
+    padding-top: 4px;
+    padding-bottom: 12px;
+  }
+
+  .intro-title {
+    font-size: clamp(56px, 8vw, 108px);
+  }
+
+  .intro-count {
+    margin-bottom: 8px;
+  }
+
+  .intro-prompt {
+    margin-top: 12px;
+  }
+
+  .intro-cta {
+    margin-top: 16px;
+    padding-top: 13px;
+    padding-bottom: 13px;
+  }
+
+  .intro-lens-wrap {
+    width: min(30vw, 340px);
   }
 }

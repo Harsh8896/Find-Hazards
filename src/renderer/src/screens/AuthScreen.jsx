@@ -48,6 +48,7 @@ function validate(form) {
   else if (industry.length > 100) errs.industry = 'Industry must be under 100 characters'
 
   if (!form.consent) errs.consent = 'Please accept to continue'
+  if (!form.marketingConsent) errs.marketingConsent = 'Please accept this consent to continue'
   return errs
 }
 
@@ -311,6 +312,8 @@ function SignUpForm({ onAuth }) {
           <label className="consent-label">
             <input
               type="checkbox"
+              required
+              aria-invalid={Boolean(errors.marketingConsent)}
               checked={form.marketingConsent}
               onChange={update('marketingConsent')}
             />
@@ -319,6 +322,7 @@ function SignUpForm({ onAuth }) {
               updates about our offering, special offers, news and events from PIP Global Safety.
             </span>
           </label>
+          {errors.marketingConsent && <span className="error">{errors.marketingConsent}</span>}
         </div>
 
         {errors.form && <p className="error field-wide">{errors.form}</p>}
