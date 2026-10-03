@@ -11,8 +11,7 @@ const SESSION_IDLE_MS = 15 * 60 * 1000 // signed out after 15 minutes without ad
 const MAX_FAILED_LOGINS = 5
 const LOCKOUT_MS = 60 * 1000
 const MIN_PASSWORD_LENGTH = 8
-// How many rows the admin dashboard's "what will the public see" preview shows — same size
-// as the public leaderboard itself (PUBLIC_LEADERBOARD_MAX in src/main/index.js).
+// How many leading rows the admin dashboard's public leaderboard preview shows.
 const LEADERBOARD_PREVIEW_SIZE = 5
 
 let session = null // { username, webContentsId, expiresAt }
@@ -84,6 +83,17 @@ export function registerAdminHandlers(handle) {
     checkNewPassword(newPassword)
     db.changeAdminPassword(s.username, newPassword)
     return { ok: true }
+  })
+
+  handle('admin:changeCredentials', (event, currentPassword, newUsername, newPassword) => {
+    const s = requireAdmin(event)
+    if (!db.verifyAdmin(s.username, currentPassword)) throw new Error('Current password is wrong')
+    const username = String(newUsername || '').trim()
+    if (!username || username.length > 100) throw new Error('Enter a valid admin ID')
+    checkNewPassword(newPassword)
+    db.changeAdminCredentials(s.username, username, newPassword)
+    s.username = username
+    return { ok: true, username }
   })
 
   handle('admin:getDashboard', (event) => {

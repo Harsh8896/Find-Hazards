@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
-import { getLeaderboard, getLeaderboardSettings, LEADERBOARD_SIZE } from '../lib/leaderboard'
+import { getLeaderboard, getLeaderboardSettings } from '../lib/leaderboard'
 
-const TOP_N = LEADERBOARD_SIZE
 const REFRESH_MS = 3000
 
 // games saved before the speed-bonus scoring have no breakdown
@@ -39,7 +38,7 @@ export default function Leaderboard({ currentPhone, onBack }) {
     const load = async () => {
       try {
         const [data, lbSettings, gameSettings] = await Promise.all([
-          getLeaderboard(TOP_N),
+          getLeaderboard(),
           getLeaderboardSettings(),
           window.api.db.getGameSettings()
         ])
@@ -119,7 +118,7 @@ export default function Leaderboard({ currentPhone, onBack }) {
             <span className="lb-chevrons">›››</span> Spot The Hazards
           </h1>
           <p className="lb-sub">
-            Leaderboard <span className="lb-sep">|</span> Top {TOP_N}
+            Leaderboard <span className="lb-sep">|</span> All Players
             <span className="lb-sep">|</span> {modeLabel}
             <span className="lb-sep">|</span> Highest score, fastest time
           </p>
@@ -141,6 +140,7 @@ export default function Leaderboard({ currentPhone, onBack }) {
             <span>Rank</span>
             <span>Name</span>
             <span>Company</span>
+            <span>Event</span>
             <span>Email</span>
             <span>Mobile</span>
             <span className="lb-num">Correct</span>
@@ -158,6 +158,9 @@ export default function Leaderboard({ currentPhone, onBack }) {
             <span className="lb-pos">{String(i + 1).padStart(2, '0')}</span>
             <span className="lb-name">{r.name}</span>
             <span className="lb-company">{r.company}</span>
+            <span className="lb-event-tag" title={r.event || 'No event'}>
+              {r.event || '—'}
+            </span>
             <span className="lb-contact">{maskEmail(r.email)}</span>
             <span className="lb-contact">{maskPhone(r.phone)}</span>
             <span className="lb-num">{show(r.hazardsFound)}</span>

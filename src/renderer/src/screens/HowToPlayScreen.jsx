@@ -1,5 +1,4 @@
 import { GAME_DURATION_SECONDS, POINTS_CORRECT, POINTS_WRONG } from '../data/hazards'
-import { LEADERBOARD_SIZE } from '../lib/leaderboard'
 
 export default function HowToPlayScreen({ durationSeconds, totalHazards, onStart, onBack }) {
   const total = totalHazards
@@ -17,7 +16,7 @@ export default function HowToPlayScreen({ durationSeconds, totalHazards, onStart
     `You get one tap per hazard — ${total} hazards, ${total} taps. Tap carefully.`,
     'Tapping a hazard you already found does not count and does not use a tap.',
     'Finish fast to earn a speed bonus — press Submit when you are done.',
-    `Top ${LEADERBOARD_SIZE} scores make the leaderboard · One attempt per mobile number.`
+    'Every player is ranked on the leaderboard · One attempt per mobile number.'
   ]
 
   return (

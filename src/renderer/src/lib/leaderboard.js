@@ -1,9 +1,9 @@
-// How many players the leaderboard shows.
+// Top-five milestone used in player feedback.
 export const LEADERBOARD_SIZE = 5
 
 // Ranking (best game per player, higher score first, then faster time) is done in SQL,
 // see getRankedPlayers in src/main/db.js.
-export const getLeaderboard = (limit = LEADERBOARD_SIZE) => window.api.db.getLeaderboard(limit)
+export const getLeaderboard = () => window.api.db.getLeaderboard()
 
 // 1-based rank of a player, or null if they haven't played yet.
 export const getPlayerRank = (phone) => window.api.db.getPlayerRank(phone)

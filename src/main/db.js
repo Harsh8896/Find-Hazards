@@ -556,7 +556,11 @@ export function updateLeaderboardSettings({ visible, mode, date, windowEnabled }
 const GAME_SCENES = ['warehouse', 'pharma', 'chemical', 'automotive', 'cement']
 const MIN_DURATION_SECONDS = 30
 const MAX_DURATION_SECONDS = 600
-const DEFAULT_GAME_SETTINGS = () => ({ scene: 'warehouse', durationSeconds: 120 })
+const DEFAULT_GAME_SETTINGS = () => ({
+  scene: 'warehouse',
+  durationSeconds: 120,
+  randomScenes: [...GAME_SCENES]
+})
 
 // Every event name the admin has ever created, newest first. Powers the admin's event dropdown
 // (to pick which one is running) and the "create a new one" list.
@@ -586,7 +590,8 @@ export function getGameSettings() {
   const rows = db
     .prepare(
       `SELECT key, value FROM settings
-       WHERE key IN ('active_scene', 'game_duration_seconds', 'active_event', 'random_scene')`
+       WHERE key IN
+         ('active_scene', 'game_duration_seconds', 'active_event', 'random_scene', 'random_scenes')`
     )
     .all()
   const byKey = Object.fromEntries(rows.map((r) => [r.key, r.value]))
@@ -607,25 +612,39 @@ export function getGameSettings() {
       : ''
   // random mode: every new sign-up gets a randomly picked scene instead of `scene`
   const randomScene = byKey.random_scene === '1'
-  return { scene, durationSeconds, activeEvent, randomScene }
+  let randomScenes = defaults.randomScenes
+  try {
+    const parsedScenes = JSON.parse(byKey.random_scenes || 'null')
+    if (Array.isArray(parsedScenes)) {
+      const validScenes = [...new Set(parsedScenes.filter((id) => GAME_SCENES.includes(id)))]
+      if (validScenes.length) randomScenes = validScenes
+    }
+  } catch {
+    // Existing installs and malformed values retain the previous all-scenes behavior.
+  }
+  return { scene, durationSeconds, activeEvent, randomScene, randomScenes }
 }
 
 // The scene and timer for the visitor who just signed up: the admin's chosen scene, or a random
-// one from every available scene while random mode is on.
+// one from the admin-selected scenes while random mode is on.
 export function pickGameForPlayer() {
   const settings = getGameSettings()
+  const availableScenes = settings.randomScenes.length ? settings.randomScenes : GAME_SCENES
   const scene = settings.randomScene
-    ? GAME_SCENES[Math.floor(Math.random() * GAME_SCENES.length)]
+    ? availableScenes[Math.floor(Math.random() * availableScenes.length)]
     : settings.scene
   return { scene, durationSeconds: settings.durationSeconds }
 }
 
-export function updateGameSettings({ scene, durationSeconds, event, randomScene }) {
+export function updateGameSettings({ scene, durationSeconds, event, randomScene, randomScenes }) {
   const current = getGameSettings()
   const parsedDuration = Number.parseInt(durationSeconds, 10)
   const eventExists =
     typeof event === 'string' &&
     (event === '' || db.prepare('SELECT 1 FROM events WHERE name = ?').get(event))
+  const selectedScenes = Array.isArray(randomScenes)
+    ? [...new Set(randomScenes.filter((id) => GAME_SCENES.includes(id)))]
+    : current.randomScenes
   const next = {
     scene: GAME_SCENES.includes(scene) ? scene : current.scene,
     durationSeconds:
@@ -635,7 +654,8 @@ export function updateGameSettings({ scene, durationSeconds, event, randomScene 
         ? parsedDuration
         : current.durationSeconds,
     activeEvent: eventExists ? event : current.activeEvent,
-    randomScene: typeof randomScene === 'boolean' ? randomScene : current.randomScene
+    randomScene: typeof randomScene === 'boolean' ? randomScene : current.randomScene,
+    randomScenes: selectedScenes.length ? selectedScenes : current.randomScenes
   }
   const upsert = db.prepare(
     `INSERT INTO settings (key, value) VALUES (@key, @value)
@@ -646,6 +666,7 @@ export function updateGameSettings({ scene, durationSeconds, event, randomScene 
     upsert.run({ key: 'game_duration_seconds', value: String(next.durationSeconds) })
     upsert.run({ key: 'active_event', value: next.activeEvent })
     upsert.run({ key: 'random_scene', value: next.randomScene ? '1' : '0' })
+    upsert.run({ key: 'random_scenes', value: JSON.stringify(next.randomScenes) })
   })()
   return next
 }
@@ -810,6 +831,21 @@ export function changeAdminPassword(username, newPassword) {
     salt,
     String(username).trim()
   )
+}
+
+export function changeAdminCredentials(currentUsername, newUsername, newPassword) {
+  const salt = randomBytes(16).toString('hex')
+  const result = db
+    .prepare(
+      'UPDATE admins SET username = ?, password_hash = ?, salt = ? WHERE username = ?'
+    )
+    .run(
+      String(newUsername).trim(),
+      hashPassword(newPassword, salt),
+      salt,
+      String(currentUsername).trim()
+    )
+  if (!result.changes) throw new Error('Admin account could not be updated')
 }
 
 // Wipes every player and game (admin accounts are kept). Used when the admin explicitly

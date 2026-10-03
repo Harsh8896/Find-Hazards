@@ -21,6 +21,8 @@ const api = {
     login: (username, password) => ipcRenderer.invoke('admin:login', username, password),
     logout: () => ipcRenderer.invoke('admin:logout'),
     changePassword: (current, next) => ipcRenderer.invoke('admin:changePassword', current, next),
+    changeCredentials: (currentPassword, username, password) =>
+      ipcRenderer.invoke('admin:changeCredentials', currentPassword, username, password),
     getDashboard: () => ipcRenderer.invoke('admin:getDashboard'),
     getPlayers: (date, scene, event) =>
       ipcRenderer.invoke('admin:getPlayers', { date, scene, event }),

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import AuthScreen from './screens/AuthScreen'
+import TitleScreen from './screens/TitleScreen'
 import IntroScreen from './screens/IntroScreen'
 import HowToPlayScreen from './screens/HowToPlayScreen'
 import GameScreen from './screens/GameScreen'
@@ -14,7 +15,7 @@ import { GAME_DURATION_SECONDS } from './data/hazards'
 
 function App() {
   const [isLeaderboard, setIsLeaderboard] = useState(() => window.location.hash === '#leaderboard')
-  const [stage, setStage] = useState('auth') // 'auth' | 'intro' | 'howto' | 'game' | 'result' | 'leaderboard' | 'admin'
+  const [stage, setStage] = useState('title') // 'title' | 'auth' | 'intro' | 'howto' | 'game' | 'result' | 'leaderboard' | 'admin'
   const [user, setUser] = useState(null)
   const [result, setResult] = useState(null)
   const [sceneId, setSceneId] = useState(DEFAULT_SCENE_ID) // which hazard-spotting game is active
@@ -82,11 +83,12 @@ function App() {
   const handleLogout = () => {
     setUser(null)
     setResult(null)
-    setStage('auth')
+    setStage('title')
   }
 
   return (
     <>
+      {stage === 'title' && <TitleScreen onStart={() => setStage('auth')} />}
       {stage === 'auth' && (
         <AuthScreen
           onAuth={handleAuth}

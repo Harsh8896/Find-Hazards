@@ -21,10 +21,6 @@ function handle(channel, fn) {
   })
 }
 
-// The public leaderboard can never ask for more rows than it shows; the full list (with every
-// player's contact details) is admin-only, see admin:getDashboard.
-const PUBLIC_LEADERBOARD_MAX = 5
-
 function registerDbHandlers() {
   handle('db:signUp', (_, data) => db.signUp(data))
   handle('db:phoneAlreadyPlayed', (_, phone) => db.phoneAlreadyPlayed(phone))
@@ -34,12 +30,9 @@ function registerDbHandlers() {
     if (player) broadcastLeaderboardChanged() // a new score can change the public ranking
     return player
   })
-  handle('db:getLeaderboard', (_, limit) => {
+  handle('db:getLeaderboard', () => {
     const { mode, date } = db.getLeaderboardSettings()
-    return db.getRankedPlayers(
-      Math.min(Number(limit) || PUBLIC_LEADERBOARD_MAX, PUBLIC_LEADERBOARD_MAX),
-      { date: mode === 'day' ? date : undefined }
-    )
+    return db.getRankedPlayers(-1, { date: mode === 'day' ? date : undefined })
   })
   // public: the sign-up and leaderboard screens need this before anyone is signed in, so it
   // can't live behind admin:getDashboard

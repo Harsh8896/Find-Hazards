@@ -434,6 +434,9 @@ function Dashboard({ onExit, onSessionExpired }) {
   const stats = isUnfiltered ? data?.stats : filteredStats
   const lbSettings = data?.leaderboardSettings
   const gameSettings = data?.gameSettings
+  const randomScenes = gameSettings?.randomScenes?.length
+    ? gameSettings.randomScenes
+    : GAME_SCENE_OPTIONS.map((option) => option.value)
 
   // resync the editable draft whenever the confirmed value changes (first load, or after a save)
   useEffect(() => {
@@ -497,7 +500,7 @@ function Dashboard({ onExit, onSessionExpired }) {
           Refresh
         </button>
         <button className="lb-button lb-button-dark" onClick={() => setShowPassword((v) => !v)}>
-          Change Password
+          Change Admin Login
         </button>
         <button
           className="lb-button lb-button-danger"
@@ -692,6 +695,36 @@ function Dashboard({ onExit, onSessionExpired }) {
             </span>
           </div>
 
+          {gameSettings.randomScene && (
+            <div className="admin-random-scenes">
+              <span className="admin-field-label">Random Scenarios</span>
+              <div className="admin-random-scene-options">
+                {GAME_SCENE_OPTIONS.map((option) => {
+                  const checked = randomScenes.includes(option.value)
+                  return (
+                    <label key={option.value} className="admin-random-scene-option">
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        disabled={savingSettings || (checked && randomScenes.length === 1)}
+                        onChange={() => {
+                          const nextScenes = checked
+                            ? randomScenes.filter((id) => id !== option.value)
+                            : [...randomScenes, option.value]
+                          updateGameSettings({ randomScenes: nextScenes })
+                        }}
+                      />
+                      <span>{option.label}</span>
+                    </label>
+                  )
+                })}
+              </div>
+              <span className="admin-random-scenes-hint">
+                New players get a random scenario from the selected list.
+              </span>
+            </div>
+          )}
+
           <div className="admin-leaderboard-control-row">
             <span className="admin-field-label">Active Game</span>
             <Select
@@ -827,7 +860,7 @@ function Dashboard({ onExit, onSessionExpired }) {
 
           <div className="admin-leaderboard-preview">
             <span className="admin-field-label">
-              What visitors will see right now
+              Public leaderboard preview — top 5
               {lbSettings.mode === 'day' ? ` — ${fmtDay(lbSettings.date)}` : ' — All-Time'}
             </span>
             {!lbSettings.visible && (
@@ -956,16 +989,18 @@ function Dashboard({ onExit, onSessionExpired }) {
 
 function ChangePasswordForm({ guard, onDone }) {
   const [current, setCurrent] = useState('')
+  const [username, setUsername] = useState('')
   const [next, setNext] = useState('')
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState('')
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (!username.trim()) return setError('Enter a new admin ID')
     if (next !== confirm) return setError('New passwords do not match')
     try {
-      const res = await guard(() => admin().changePassword(current, next))
-      if (res?.ok) onDone('Password changed.')
+      const res = await guard(() => admin().changeCredentials(current, username, next))
+      if (res?.ok) onDone('Admin login updated.')
     } catch (err) {
       setError(cleanError(err))
     }
@@ -978,7 +1013,17 @@ function ChangePasswordForm({ guard, onDone }) {
         <input type="password" value={current} onChange={(e) => setCurrent(e.target.value)} />
       </label>
       <label className="admin-field">
-        <span>New password</span>
+        <span>New admin ID</span>
+        <input
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          autoComplete="username"
+          maxLength={100}
+        />
+      </label>
+      <label className="admin-field">
+        <span>New password (minimum 8 characters)</span>
         <input type="password" value={next} onChange={(e) => setNext(e.target.value)} />
       </label>
       <label className="admin-field">
@@ -988,7 +1033,7 @@ function ChangePasswordForm({ guard, onDone }) {
       {error && <p className="admin-error">{error}</p>}
       <div className="admin-card-actions">
         <button type="submit" className="lb-button">
-          Save Password
+          Save Admin Login
         </button>
       </div>
     </form>
