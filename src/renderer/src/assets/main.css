@@ -2677,3 +2677,44 @@ body {
     width: min(30vw, 340px);
   }
 }
+
+/* ---------- Contact number: country picker (flag + dial code) in front of the input ---------- */
+.phone-row {
+  display: flex;
+  gap: 8px;
+}
+
+.phone-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.field-select-trigger.country-trigger {
+  width: auto;
+  flex: none;
+  padding: 12px 12px;
+  gap: 8px;
+}
+
+.country-trigger .fi,
+.country-option .fi {
+  width: 24px;
+  height: 18px;
+  flex: none;
+  background-size: cover;
+  border-radius: 2px;
+}
+
+.country-option {
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+.country-option-name {
+  flex: 1;
+}
+
+.country-option-dial {
+  color: #888;
+  font-size: 14px;
+}

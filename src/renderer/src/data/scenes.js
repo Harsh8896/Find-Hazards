@@ -91,6 +91,9 @@ export const SCENES = {
     // vector scene: hazards are hand-traced polygons tinted with CSS/SVG at tap time, not
     // designer PNG cut-outs — see VECTOR_OBJECTS and GameScreen's vector-scene branch.
     kind: 'vector',
+    // one tap on a hazard lights up all its objects (e.g. slipping worker + oil spill,
+    // exit door + the boxes blocking it)
+    highlightAllKeys: true,
     sceneUrl: automotiveSceneUrl,
     imageWidth: 1448,
     imageHeight: 813,

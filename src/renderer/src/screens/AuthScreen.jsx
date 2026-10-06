@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react'
 import SearchableSelect from '../components/SearchableSelect'
 import { emailAlreadyPlayed, phoneAlreadyPlayed, signUp } from '../lib/auth'
 import { getLeaderboardSettings } from '../lib/leaderboard'
+import CountrySelect from '../components/CountrySelect'
 import { INDIAN_STATES } from '../data/indianStates'
+import { DEFAULT_COUNTRY, fullPhone } from '../data/countries'
 
-const PHONE_LENGTH = 10
 const NAME_RE = /^[A-Za-z][A-Za-z .'-]*$/
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[A-Za-z]{2,}$/
 
@@ -29,8 +30,14 @@ function validate(form) {
   else if (!NAME_RE.test(lastName)) errs.lastName = 'Last name can only contain letters'
 
   if (!form.phone) errs.phone = 'Mobile number is required'
-  else if (form.phone.length !== PHONE_LENGTH)
-    errs.phone = `Mobile number must be exactly ${PHONE_LENGTH} digits`
+  else {
+    const { min, max, name } = form.country
+    if (form.phone.length < min || form.phone.length > max)
+      errs.phone =
+        min === max
+          ? `${name} mobile number must be exactly ${min} digits`
+          : `${name} mobile number must be ${min}-${max} digits`
+  }
 
   if (!email) errs.email = 'Email is required'
   else if (email.length > 100 || !EMAIL_RE.test(email)) errs.email = 'Enter a valid email address'
@@ -55,9 +62,16 @@ function validate(form) {
   return errs
 }
 
+function cleanPhone(value, country) {
+  let digits = value.replace(/\D/g, '')
+  if (country.iso !== 'in') digits = digits.replace(/^0+/, '')
+  return digits.slice(0, country.max)
+}
+
 const EMPTY = {
   firstName: '',
   lastName: '',
+  country: DEFAULT_COUNTRY,
   phone: '',
   email: '',
   company: '',
@@ -152,8 +166,9 @@ function SignUpForm({ onAuth }) {
 
   const update = (key) => (e) => {
     let value = key === 'consent' || key === 'marketingConsent' ? e.target.checked : e.target.value
-    // mobile: digits only, never more than 10 (also blocks pasting a longer number)
-    if (key === 'phone') value = value.replace(/\D/g, '').slice(0, PHONE_LENGTH)
+    // mobile: digits only, never more than the country's length (also blocks pasting a longer
+    // number); a leading 0 (local dialling prefix) is dropped for countries other than India
+    if (key === 'phone') value = cleanPhone(value, form.country)
     setField(key, value)
   }
 
@@ -166,9 +181,11 @@ function SignUpForm({ onAuth }) {
 
     setSubmitting(true)
     try {
+      // India stays a bare 10-digit number; other countries get their dial code in front
+      const phone = fullPhone(form.country, form.phone)
       // duplicate checks need the database, so they run after the form itself is valid
       const [phoneTaken, emailTaken] = await Promise.all([
-        phoneAlreadyPlayed(form.phone),
+        phoneAlreadyPlayed(phone),
         emailAlreadyPlayed(form.email)
       ])
       if (phoneTaken || emailTaken) {
@@ -180,7 +197,7 @@ function SignUpForm({ onAuth }) {
         })
         return
       }
-      onAuth(await signUp(form))
+      onAuth(await signUp({ ...form, phone }))
     } catch (err) {
       setErrors({ form: `Could not save your details: ${err.message}` })
     } finally {
@@ -261,16 +278,32 @@ function SignUpForm({ onAuth }) {
 
         <div className="field">
           <label htmlFor="phone">Contact Number</label>
-          <input
-            id="phone"
-            type="tel"
-            inputMode="numeric"
-            value={form.phone}
-            onChange={update('phone')}
-            placeholder="10-digit mobile number"
-            maxLength={PHONE_LENGTH}
-            aria-invalid={Boolean(errors.phone)}
-          />
+          <div className="phone-row">
+            <CountrySelect
+              value={form.country}
+              onChange={(country) =>
+                setForm((f) => ({
+                  ...f,
+                  country,
+                  phone: cleanPhone(f.phone, country)
+                }))
+              }
+            />
+            <input
+              id="phone"
+              type="tel"
+              inputMode="numeric"
+              value={form.phone}
+              onChange={update('phone')}
+              placeholder={
+                form.country.min === form.country.max
+                  ? `${form.country.min}-digit mobile number`
+                  : 'Mobile number'
+              }
+              maxLength={form.country.max}
+              aria-invalid={Boolean(errors.phone)}
+            />
+          </div>
           {errors.phone && <span className="error">{errors.phone}</span>}
         </div>
 

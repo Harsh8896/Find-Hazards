@@ -695,6 +695,26 @@ function Dashboard({ onExit, onSessionExpired }) {
             </span>
           </div>
 
+          <div className="admin-leaderboard-control-row">
+            <span className="admin-field-label">Unlimited Wrong Taps</span>
+            <button
+              type="button"
+              className={`admin-toggle ${gameSettings.unlimitedWrongTaps ? 'admin-toggle-on' : ''}`}
+              disabled={savingSettings}
+              aria-pressed={gameSettings.unlimitedWrongTaps}
+              onClick={() =>
+                updateGameSettings({ unlimitedWrongTaps: !gameSettings.unlimitedWrongTaps })
+              }
+            >
+              <span className="admin-toggle-knob" />
+            </button>
+            <span className="admin-toggle-state">
+              {gameSettings.unlimitedWrongTaps
+                ? 'On — wrong taps do not use up the tap limit'
+                : 'Off — tap limit equals the number of hazards'}
+            </span>
+          </div>
+
           {gameSettings.randomScene && (
             <div className="admin-random-scenes">
               <span className="admin-field-label">Random Scenarios</span>

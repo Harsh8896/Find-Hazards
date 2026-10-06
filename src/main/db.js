@@ -559,7 +559,8 @@ const MAX_DURATION_SECONDS = 600
 const DEFAULT_GAME_SETTINGS = () => ({
   scene: 'warehouse',
   durationSeconds: 120,
-  randomScenes: [...GAME_SCENES]
+  randomScenes: [...GAME_SCENES],
+  unlimitedWrongTaps: false
 })
 
 // Every event name the admin has ever created, newest first. Powers the admin's event dropdown
@@ -591,7 +592,8 @@ export function getGameSettings() {
     .prepare(
       `SELECT key, value FROM settings
        WHERE key IN
-         ('active_scene', 'game_duration_seconds', 'active_event', 'random_scene', 'random_scenes')`
+         ('active_scene', 'game_duration_seconds', 'active_event', 'random_scene', 'random_scenes',
+          'unlimited_wrong_taps')`
     )
     .all()
   const byKey = Object.fromEntries(rows.map((r) => [r.key, r.value]))
@@ -622,7 +624,8 @@ export function getGameSettings() {
   } catch {
     // Existing installs and malformed values retain the previous all-scenes behavior.
   }
-  return { scene, durationSeconds, activeEvent, randomScene, randomScenes }
+  const unlimitedWrongTaps = byKey.unlimited_wrong_taps === '1'
+  return { scene, durationSeconds, activeEvent, randomScene, randomScenes, unlimitedWrongTaps }
 }
 
 // The scene and timer for the visitor who just signed up: the admin's chosen scene, or a random
@@ -633,10 +636,21 @@ export function pickGameForPlayer() {
   const scene = settings.randomScene
     ? availableScenes[Math.floor(Math.random() * availableScenes.length)]
     : settings.scene
-  return { scene, durationSeconds: settings.durationSeconds }
+  return {
+    scene,
+    durationSeconds: settings.durationSeconds,
+    unlimitedWrongTaps: settings.unlimitedWrongTaps
+  }
 }
 
-export function updateGameSettings({ scene, durationSeconds, event, randomScene, randomScenes }) {
+export function updateGameSettings({
+  scene,
+  durationSeconds,
+  event,
+  randomScene,
+  randomScenes,
+  unlimitedWrongTaps
+}) {
   const current = getGameSettings()
   const parsedDuration = Number.parseInt(durationSeconds, 10)
   const eventExists =
@@ -655,7 +669,9 @@ export function updateGameSettings({ scene, durationSeconds, event, randomScene,
         : current.durationSeconds,
     activeEvent: eventExists ? event : current.activeEvent,
     randomScene: typeof randomScene === 'boolean' ? randomScene : current.randomScene,
-    randomScenes: selectedScenes.length ? selectedScenes : current.randomScenes
+    randomScenes: selectedScenes.length ? selectedScenes : current.randomScenes,
+    unlimitedWrongTaps:
+      typeof unlimitedWrongTaps === 'boolean' ? unlimitedWrongTaps : current.unlimitedWrongTaps
   }
   const upsert = db.prepare(
     `INSERT INTO settings (key, value) VALUES (@key, @value)
@@ -667,6 +683,7 @@ export function updateGameSettings({ scene, durationSeconds, event, randomScene,
     upsert.run({ key: 'active_event', value: next.activeEvent })
     upsert.run({ key: 'random_scene', value: next.randomScene ? '1' : '0' })
     upsert.run({ key: 'random_scenes', value: JSON.stringify(next.randomScenes) })
+    upsert.run({ key: 'unlimited_wrong_taps', value: next.unlimitedWrongTaps ? '1' : '0' })
   })()
   return next
 }
@@ -836,9 +853,7 @@ export function changeAdminPassword(username, newPassword) {
 export function changeAdminCredentials(currentUsername, newUsername, newPassword) {
   const salt = randomBytes(16).toString('hex')
   const result = db
-    .prepare(
-      'UPDATE admins SET username = ?, password_hash = ?, salt = ? WHERE username = ?'
-    )
+    .prepare('UPDATE admins SET username = ?, password_hash = ?, salt = ? WHERE username = ?')
     .run(
       String(newUsername).trim(),
       hashPassword(newPassword, salt),

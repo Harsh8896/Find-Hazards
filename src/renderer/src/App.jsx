@@ -20,6 +20,7 @@ function App() {
   const [result, setResult] = useState(null)
   const [sceneId, setSceneId] = useState(DEFAULT_SCENE_ID) // which hazard-spotting game is active
   const [durationSeconds, setDurationSeconds] = useState(GAME_DURATION_SECONDS) // admin-set round length
+  const [unlimitedWrongTaps, setUnlimitedWrongTaps] = useState(false) // admin: wrong taps don't use up taps
 
   useEffect(() => {
     const onHashChange = () => setIsLeaderboard(window.location.hash === '#leaderboard')
@@ -39,9 +40,10 @@ function App() {
     // picked fresh per visitor, so an admin's scene/timer change applies from the next sign-up on,
     // and in random mode each visitor gets their own randomly picked scene
     try {
-      const { scene, durationSeconds: adminDuration } = await window.api.db.pickGameForPlayer()
-      setSceneId(scene)
-      setDurationSeconds(adminDuration)
+      const game = await window.api.db.pickGameForPlayer()
+      setSceneId(game.scene)
+      setDurationSeconds(game.durationSeconds)
+      setUnlimitedWrongTaps(Boolean(game.unlimitedWrongTaps))
     } catch (err) {
       console.error('Could not load game settings, using the defaults', err)
     }
@@ -115,6 +117,7 @@ function App() {
         <GameScreen
           scene={sceneFor(sceneId)}
           durationSeconds={durationSeconds}
+          unlimitedWrongTaps={unlimitedWrongTaps}
           onFinish={handleFinish}
         />
       )}

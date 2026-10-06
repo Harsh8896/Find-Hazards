@@ -1,5 +1,6 @@
 // All Indian states and union territories, for the signup form's State field.
 export const INDIAN_STATES = [
+  'Other', // for anyone whose state isn't in this list
   'Andhra Pradesh',
   'Arunachal Pradesh',
   'Assam',

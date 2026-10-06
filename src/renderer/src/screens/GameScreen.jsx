@@ -9,7 +9,7 @@ import { smoothClosedPath } from '../lib/smoothPath'
 
 const TOAST_MS = 1800
 
-export default function GameScreen({ scene, durationSeconds, onFinish }) {
+export default function GameScreen({ scene, durationSeconds, unlimitedWrongTaps, onFinish }) {
   const { HAZARDS, hazardByNum, hazardForKey } = scene
   // One tap per hazard: as many taps as there are hazards.
   const MAX_TAPS = HAZARDS.length
@@ -37,6 +37,8 @@ export default function GameScreen({ scene, durationSeconds, onFinish }) {
   }, [])
 
   const tapsUsed = found.size + wrongTaps.length
+  // with the admin's "unlimited wrong taps" on, only found hazards use up the tap limit
+  const limitUsed = unlimitedWrongTaps ? found.size : tapsUsed
   const wrongObjectIds = [...new Set(wrongTaps.map((t) => t.objectId).filter(Boolean))]
 
   useEffect(() => {
@@ -82,7 +84,7 @@ export default function GameScreen({ scene, durationSeconds, onFinish }) {
   const handleTap = (e) => {
     if (!ready || phase !== 'playing') return
     // out of taps: the board stops accepting taps, but the game only ends on Submit or time-out
-    if (tapsUsed >= MAX_TAPS) return
+    if (limitUsed >= MAX_TAPS) return
 
     const rect = imgRef.current.getBoundingClientRect()
     const fx = (e.clientX - rect.left) / rect.width
@@ -113,7 +115,7 @@ export default function GameScreen({ scene, durationSeconds, onFinish }) {
 
   const { score, speedBonus } = calculateScore({
     correct: found.size,
-    wrong: wrongTaps.length,
+    wrong: unlimitedWrongTaps ? 0 : wrongTaps.length, // no minus marking when wrong taps are unlimited
     secondsLeft: timeLeft,
     totalHazards: HAZARDS.length
   })
@@ -138,10 +140,12 @@ export default function GameScreen({ scene, durationSeconds, onFinish }) {
   const isVector = scene.kind === 'vector'
   const keyToId = isVector ? (key) => vectorIdForKey(scene, key) : idForKey
   // Raster hazards can span multiple designer cut-outs; vector scenes highlight only the
-  // precise polygon that was tapped, even when multiple polygons belong to one hazard.
-  const foundIds = isVector
-    ? [...foundVectorIds]
-    : [...found].flatMap((num) => hazardByNum.get(num).keys.map(keyToId))
+  // precise polygon that was tapped, even when multiple polygons belong to one hazard — unless
+  // the scene sets `highlightAllKeys`, then one tap lights up every object of that hazard.
+  const foundIds =
+    isVector && !scene.highlightAllKeys
+      ? [...foundVectorIds]
+      : [...found].flatMap((num) => hazardByNum.get(num).keys.map(keyToId))
   const debugIds = debug
     ? isVector
       ? scene.vectorObjects
@@ -177,7 +181,7 @@ export default function GameScreen({ scene, durationSeconds, onFinish }) {
             <div className="hud-item">
               <span className="hud-label">Taps</span>
               <span className="hud-value">
-                {tapsUsed}/{MAX_TAPS}
+                {unlimitedWrongTaps ? tapsUsed : `${tapsUsed}/${MAX_TAPS}`}
               </span>
             </div>
             <button
@@ -277,7 +281,7 @@ export default function GameScreen({ scene, durationSeconds, onFinish }) {
         </div>
       )}
 
-      {phase === 'playing' && ready && tapsUsed >= MAX_TAPS && (
+      {phase === 'playing' && ready && !unlimitedWrongTaps && tapsUsed >= MAX_TAPS && (
         <div className="taps-out-banner">
           All {MAX_TAPS} taps used — press Submit to lock in your score
         </div>
