@@ -7,7 +7,7 @@ import { OBJECTS, highlightFor, hitTest, idForKey, loadSceneMap } from '../lib/s
 import { hitTestVector, vectorIdForKey } from '../lib/vectorHit'
 import { smoothClosedPath } from '../lib/smoothPath'
 
-const TOAST_MS = 1800
+const TOAST_MS = 5000
 
 export default function GameScreen({ scene, durationSeconds, unlimitedWrongTaps, onFinish }) {
   const { HAZARDS, hazardByNum, hazardForKey } = scene

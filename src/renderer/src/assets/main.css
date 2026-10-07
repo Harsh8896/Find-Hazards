@@ -816,7 +816,7 @@ body {
   font-size: 18px;
   font-weight: 700;
   pointer-events: none;
-  animation: toast-in 1800ms ease forwards;
+  animation: toast-in 5000ms ease forwards;
 }
 
 .found-toast-check {
@@ -835,8 +835,8 @@ body {
     opacity: 0;
     transform: translate(-50%, -8px);
   }
-  12%,
-  80% {
+  4%,
+  92% {
     opacity: 1;
     transform: translate(-50%, 0);
   }
