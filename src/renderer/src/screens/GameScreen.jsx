@@ -66,6 +66,11 @@ export default function GameScreen({ scene, durationSeconds, unlimitedWrongTaps,
     return () => clearTimeout(t)
   }, [ready, timeLeft, phase])
 
+  // last tap used: submit right away so the clock stops at that moment
+  useEffect(() => {
+    if (ready && phase === 'playing' && limitUsed >= MAX_TAPS) setPhase('reveal')
+  }, [ready, phase, limitUsed, MAX_TAPS])
+
   useEffect(() => {
     if (!toast) return
     const t = setTimeout(() => setToast(null), TOAST_MS)
@@ -83,7 +88,7 @@ export default function GameScreen({ scene, durationSeconds, unlimitedWrongTaps,
 
   const handleTap = (e) => {
     if (!ready || phase !== 'playing') return
-    // out of taps: the board stops accepting taps, but the game only ends on Submit or time-out
+    // out of taps: the game auto-submits (see effect above), so no more taps are accepted
     if (limitUsed >= MAX_TAPS) return
 
     const rect = imgRef.current.getBoundingClientRect()
@@ -278,12 +283,6 @@ export default function GameScreen({ scene, durationSeconds, unlimitedWrongTaps,
       {toast && phase === 'playing' && (
         <div key={toast.key} className="found-toast">
           <span className="found-toast-check">✓</span> {toast.text}
-        </div>
-      )}
-
-      {phase === 'playing' && ready && !unlimitedWrongTaps && tapsUsed >= MAX_TAPS && (
-        <div className="taps-out-banner">
-          All {MAX_TAPS} taps used — press Submit to lock in your score
         </div>
       )}
 

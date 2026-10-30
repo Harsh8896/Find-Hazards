@@ -46,15 +46,19 @@ function validate(form) {
   else if (company.length < 2) errs.company = 'Company must be at least 2 characters'
   else if (company.length > 100) errs.company = 'Company must be under 100 characters'
 
-  if (!designation) errs.designation = 'Job title is required'
-  else if (designation.length < 2) errs.designation = 'Job title must be at least 2 characters'
+  if (!designation) {
+    // optional
+  } else if (designation.length < 2) errs.designation = 'Job title must be at least 2 characters'
   else if (designation.length > 50) errs.designation = 'Job title must be under 50 characters'
 
-  if (!state) errs.state = 'State is required'
-  else if (state.length > 50) errs.state = 'State must be under 50 characters'
+  if (!state) {
+    // optional
+  } else if (state.length > 50) errs.state = 'State must be under 50 characters'
 
-  if (!industry) errs.industry = 'Industry is required'
-  else if (industry.length < 2) errs.industry = 'Industry must be at least 2 characters'
+  // job title, state and industry are optional — only check them when filled in
+  if (!industry) {
+    // optional
+  } else if (industry.length < 2) errs.industry = 'Industry must be at least 2 characters'
   else if (industry.length > 100) errs.industry = 'Industry must be under 100 characters'
 
   if (!form.consent) errs.consent = 'Please accept to continue'
@@ -211,7 +215,9 @@ function SignUpForm({ onAuth }) {
       <p className="signup-sub">Fill in your details to start playing.</p>
       <form className="signup-form" onSubmit={handleSubmit} noValidate>
         <div className="field">
-          <label htmlFor="firstName">First Name</label>
+          <label htmlFor="firstName">
+            First Name <span className="req">*</span>
+          </label>
           <input
             id="firstName"
             value={form.firstName}
@@ -224,7 +230,9 @@ function SignUpForm({ onAuth }) {
         </div>
 
         <div className="field">
-          <label htmlFor="lastName">Last Name</label>
+          <label htmlFor="lastName">
+            Last Name <span className="req">*</span>
+          </label>
           <input
             id="lastName"
             value={form.lastName}
@@ -237,7 +245,9 @@ function SignUpForm({ onAuth }) {
         </div>
 
         <div className="field">
-          <label htmlFor="company">Company Name</label>
+          <label htmlFor="company">
+            Company Name <span className="req">*</span>
+          </label>
           <input
             id="company"
             value={form.company}
@@ -263,7 +273,9 @@ function SignUpForm({ onAuth }) {
         </div>
 
         <div className="field">
-          <label htmlFor="email">Business Email</label>
+          <label htmlFor="email">
+            Business Email <span className="req">*</span>
+          </label>
           <input
             id="email"
             type="email"
@@ -277,7 +289,9 @@ function SignUpForm({ onAuth }) {
         </div>
 
         <div className="field">
-          <label htmlFor="phone">Contact Number</label>
+          <label htmlFor="phone">
+            Contact Number <span className="req">*</span>
+          </label>
           <div className="phone-row">
             <CountrySelect
               value={form.country}
@@ -338,7 +352,8 @@ function SignUpForm({ onAuth }) {
           <label className="consent-label">
             <input type="checkbox" checked={form.consent} onChange={update('consent')} />
             <span>
-              I would like to be contacted by PIP Global Safety to discuss my specific requirements.
+              I would like to be contacted by PIP Global Safety to discuss my specific requirements.{' '}
+              <span className="req">*</span>
             </span>
           </label>
           {errors.consent && <span className="error">{errors.consent}</span>}
@@ -355,7 +370,8 @@ function SignUpForm({ onAuth }) {
             />
             <span>
               By checking this box, you agree to receive marketing e-communications, including
-              updates about our offering, special offers, news and events from PIP Global Safety.
+              updates about our offering, special offers, news and events from PIP Global Safety.{' '}
+              <span className="req">*</span>
             </span>
           </label>
           {errors.marketingConsent && <span className="error">{errors.marketingConsent}</span>}
