@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DateFilterSelect from '../components/DateFilterSelect'
 import Select from '../components/Select'
 import { SCENES } from '../data/scenes'
+import { SIGNUP_FIELDS, DEFAULT_REQUIRED_FIELDS } from '../data/signupFields'
 
 const GAME_SCENE_OPTIONS = Object.values(SCENES).map((s) => ({ value: s.id, label: s.label }))
 const SCENE_OPTIONS = [{ value: 'all', label: 'All Scenarios' }, ...GAME_SCENE_OPTIONS]
@@ -744,6 +745,30 @@ function Dashboard({ onExit, onSessionExpired }) {
               </span>
             </div>
           )}
+
+          <div className="admin-random-scenes">
+            <span className="admin-field-label">Sign-up Fields</span>
+            <div className="admin-random-scene-options">
+              {SIGNUP_FIELDS.map((f) => {
+                const required = (gameSettings.requiredFields ?? DEFAULT_REQUIRED_FIELDS)[f.key]
+                return (
+                  <label key={f.key} className="admin-random-scene-option">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(required)}
+                      disabled={savingSettings}
+                      onChange={() => updateGameSettings({ requiredFields: { [f.key]: !required } })}
+                    />
+                    <span>{f.label}</span>
+                  </label>
+                )
+              })}
+            </div>
+            <span className="admin-random-scenes-hint">
+              Ticked fields are compulsory; unticked fields are optional. Mobile number is always
+              required.
+            </span>
+          </div>
 
           <div className="admin-leaderboard-control-row">
             <span className="admin-field-label">Active Game</span>

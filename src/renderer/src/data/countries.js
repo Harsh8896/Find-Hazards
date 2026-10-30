@@ -4,6 +4,33 @@
 export const COUNTRIES = [
   { iso: 'in', name: 'India', dial: '91', min: 10, max: 10 },
   { iso: 'ae', name: 'United Arab Emirates', dial: '971', min: 9, max: 9 },
+  ...[
+    { iso: 'am', name: 'Armenia', dial: '374', min: 8, max: 8 },
+    { iso: 'az', name: 'Azerbaijan', dial: '994', min: 9, max: 9 },
+    { iso: 'bn', name: 'Brunei', dial: '673', min: 7, max: 7 },
+    { iso: 'kh', name: 'Cambodia', dial: '855', min: 8, max: 9 },
+    { iso: 'cy', name: 'Cyprus', dial: '357', min: 8, max: 8 },
+    { iso: 'ge', name: 'Georgia', dial: '995', min: 9, max: 9 },
+    { iso: 'ir', name: 'Iran', dial: '98', min: 10, max: 10 },
+    { iso: 'il', name: 'Israel', dial: '972', min: 9, max: 9 },
+    { iso: 'jo', name: 'Jordan', dial: '962', min: 9, max: 9 },
+    { iso: 'kz', name: 'Kazakhstan', dial: '7', min: 10, max: 10 },
+    { iso: 'kg', name: 'Kyrgyzstan', dial: '996', min: 9, max: 9 },
+    { iso: 'la', name: 'Laos', dial: '856', min: 9, max: 10 },
+    { iso: 'lb', name: 'Lebanon', dial: '961', min: 7, max: 8 },
+    { iso: 'mo', name: 'Macau', dial: '853', min: 8, max: 8 },
+    { iso: 'mv', name: 'Maldives', dial: '960', min: 7, max: 7 },
+    { iso: 'mn', name: 'Mongolia', dial: '976', min: 8, max: 8 },
+    { iso: 'kp', name: 'North Korea', dial: '850', min: 10, max: 10 },
+    { iso: 'ps', name: 'Palestine', dial: '970', min: 9, max: 9 },
+    { iso: 'sy', name: 'Syria', dial: '963', min: 9, max: 9 },
+    { iso: 'tw', name: 'Taiwan', dial: '886', min: 9, max: 9 },
+    { iso: 'tj', name: 'Tajikistan', dial: '992', min: 9, max: 9 },
+    { iso: 'tl', name: 'Timor-Leste', dial: '670', min: 8, max: 8 },
+    { iso: 'tm', name: 'Turkmenistan', dial: '993', min: 8, max: 8 },
+    { iso: 'uz', name: 'Uzbekistan', dial: '998', min: 9, max: 9 },
+    { iso: 'ye', name: 'Yemen', dial: '967', min: 9, max: 9 }
+  ],
   { iso: 'af', name: 'Afghanistan', dial: '93', min: 9, max: 9 },
   { iso: 'au', name: 'Australia', dial: '61', min: 9, max: 9 },
   { iso: 'bd', name: 'Bangladesh', dial: '880', min: 10, max: 10 },
@@ -45,7 +72,11 @@ export const COUNTRIES = [
   { iso: 'us', name: 'United States', dial: '1', min: 10, max: 10 },
   { iso: 'vn', name: 'Vietnam', dial: '84', min: 9, max: 10 },
   { iso: 'za', name: 'South Africa', dial: '27', min: 9, max: 9 }
-]
+].sort((a, b) => {
+  // India and UAE stay pinned on top; the rest are alphabetical
+  const pin = (c) => (c.iso === 'in' ? 0 : c.iso === 'ae' ? 1 : 2)
+  return pin(a) - pin(b) || a.name.localeCompare(b.name)
+})
 
 export const DEFAULT_COUNTRY = COUNTRIES[0] // India
 
@@ -55,3 +86,18 @@ export const DEFAULT_COUNTRY = COUNTRIES[0] // India
 
 export const fullPhone = (country, national) =>
   country.iso === 'in' ? national : `${country.dial}${national}`
+
+// Reverse of fullPhone: bare 10 digits are Indian; otherwise match the dial code + length.
+export const dialCodeFromPhone = (phone) => {
+  const digits = String(phone || '').replace(/\D/g, '')
+  if (!digits) return ''
+  if (digits.length === 10) return '+91'
+  const match = COUNTRIES.filter(
+    (c) =>
+      c.iso !== 'in' &&
+      digits.startsWith(c.dial) &&
+      digits.length - c.dial.length >= c.min &&
+      digits.length - c.dial.length <= c.max
+  ).sort((a, b) => b.dial.length - a.dial.length)[0]
+  return match ? `+${match.dial}` : ''
+}

@@ -1078,9 +1078,9 @@ body {
 
 .lb-row {
   display: grid;
-  grid-template-columns: 64px 1.25fr 0.8fr 1.1fr 1.2fr 112px 74px 68px 82px 68px 76px;
+  grid-template-columns: 64px 1.25fr 0.8fr 1.1fr 1.2fr 76px 112px 74px 68px 82px 68px 76px;
   align-items: center;
-  min-width: 1150px;
+  min-width: 1226px;
   min-height: 60px;
   background: var(--lb-panel);
   border-left: 4px solid transparent;

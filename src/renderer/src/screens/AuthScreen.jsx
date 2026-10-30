@@ -5,11 +5,12 @@ import { getLeaderboardSettings } from '../lib/leaderboard'
 import CountrySelect from '../components/CountrySelect'
 import { INDIAN_STATES } from '../data/indianStates'
 import { DEFAULT_COUNTRY, fullPhone } from '../data/countries'
+import { DEFAULT_REQUIRED_FIELDS } from '../data/signupFields'
 
 const NAME_RE = /^[A-Za-z][A-Za-z .'-]*$/
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[A-Za-z]{2,}$/
 
-function validate(form) {
+function validate(form, req) {
   const errs = {}
   const firstName = form.firstName.trim()
   const lastName = form.lastName.trim()
@@ -19,13 +20,15 @@ function validate(form) {
   const state = form.state.trim()
   const industry = form.industry.trim()
 
-  if (!firstName) errs.firstName = 'First name is required'
-  else if (firstName.length < 2) errs.firstName = 'First name must be at least 2 characters'
+  if (!firstName) {
+    if (req.firstName) errs.firstName = 'First name is required'
+  } else if (firstName.length < 2) errs.firstName = 'First name must be at least 2 characters'
   else if (firstName.length > 50) errs.firstName = 'First name must be under 50 characters'
   else if (!NAME_RE.test(firstName)) errs.firstName = 'First name can only contain letters'
 
-  if (!lastName) errs.lastName = 'Last name is required'
-  else if (lastName.length < 2) errs.lastName = 'Last name must be at least 2 characters'
+  if (!lastName) {
+    if (req.lastName) errs.lastName = 'Last name is required'
+  } else if (lastName.length < 2) errs.lastName = 'Last name must be at least 2 characters'
   else if (lastName.length > 50) errs.lastName = 'Last name must be under 50 characters'
   else if (!NAME_RE.test(lastName)) errs.lastName = 'Last name can only contain letters'
 
@@ -39,30 +42,32 @@ function validate(form) {
           : `${name} mobile number must be ${min}-${max} digits`
   }
 
-  if (!email) errs.email = 'Email is required'
-  else if (email.length > 100 || !EMAIL_RE.test(email)) errs.email = 'Enter a valid email address'
+  if (!email) {
+    if (req.email) errs.email = 'Email is required'
+  } else if (email.length > 100 || !EMAIL_RE.test(email)) errs.email = 'Enter a valid email address'
 
-  if (!company) errs.company = 'Company is required'
-  else if (company.length < 2) errs.company = 'Company must be at least 2 characters'
+  if (!company) {
+    if (req.company) errs.company = 'Company is required'
+  } else if (company.length < 2) errs.company = 'Company must be at least 2 characters'
   else if (company.length > 100) errs.company = 'Company must be under 100 characters'
 
   if (!designation) {
-    // optional
+    if (req.designation) errs.designation = 'Job title is required'
   } else if (designation.length < 2) errs.designation = 'Job title must be at least 2 characters'
   else if (designation.length > 50) errs.designation = 'Job title must be under 50 characters'
 
   if (!state) {
-    // optional
+    if (req.state) errs.state = 'State is required'
   } else if (state.length > 50) errs.state = 'State must be under 50 characters'
 
-  // job title, state and industry are optional — only check them when filled in
   if (!industry) {
-    // optional
+    if (req.industry) errs.industry = 'Industry is required'
   } else if (industry.length < 2) errs.industry = 'Industry must be at least 2 characters'
   else if (industry.length > 100) errs.industry = 'Industry must be under 100 characters'
 
-  if (!form.consent) errs.consent = 'Please accept to continue'
-  if (!form.marketingConsent) errs.marketingConsent = 'Please accept this consent to continue'
+  if (req.consent && !form.consent) errs.consent = 'Please accept to continue'
+  if (req.marketingConsent && !form.marketingConsent)
+    errs.marketingConsent = 'Please accept this consent to continue'
   return errs
 }
 
@@ -89,6 +94,7 @@ const EMPTY = {
 export default function AuthScreen({ onAuth, onLeaderboard, onAdmin }) {
   const [leaderboardVisible, setLeaderboardVisible] = useState(false)
   const [activeEvent, setActiveEvent] = useState('')
+  const [required, setRequired] = useState(DEFAULT_REQUIRED_FIELDS)
 
   useEffect(() => {
     let cancelled = false
@@ -101,6 +107,7 @@ export default function AuthScreen({ onAuth, onLeaderboard, onAdmin }) {
       .getGameSettings()
       .then((s) => {
         if (!cancelled) setActiveEvent(s.activeEvent || '')
+        if (!cancelled && s.requiredFields) setRequired(s.requiredFields)
       })
       .catch(() => {}) // no admin-set event: just don't show one
     return () => {
@@ -137,7 +144,7 @@ export default function AuthScreen({ onAuth, onLeaderboard, onAdmin }) {
       )}
 
       <div className="signup-card">
-        <SignUpForm onAuth={onAuth} />
+        <SignUpForm onAuth={onAuth} required={required} />
       </div>
 
       <div className="signup-footer">
@@ -157,10 +164,11 @@ export default function AuthScreen({ onAuth, onLeaderboard, onAdmin }) {
   )
 }
 
-function SignUpForm({ onAuth }) {
+function SignUpForm({ onAuth, required }) {
   const [form, setForm] = useState(EMPTY)
   const [errors, setErrors] = useState({})
   const [submitting, setSubmitting] = useState(false)
+  const star = (key) => (required[key] ? <span className="req">*</span> : null)
 
   const setField = (key, value) => {
     setForm((f) => ({ ...f, [key]: value }))
@@ -179,7 +187,7 @@ function SignUpForm({ onAuth }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (submitting) return
-    const errs = validate(form)
+    const errs = validate(form, required)
     setErrors(errs)
     if (Object.keys(errs).length) return
 
@@ -190,7 +198,7 @@ function SignUpForm({ onAuth }) {
       // duplicate checks need the database, so they run after the form itself is valid
       const [phoneTaken, emailTaken] = await Promise.all([
         phoneAlreadyPlayed(phone),
-        emailAlreadyPlayed(form.email)
+        form.email.trim() ? emailAlreadyPlayed(form.email) : false
       ])
       if (phoneTaken || emailTaken) {
         setErrors({
@@ -216,7 +224,7 @@ function SignUpForm({ onAuth }) {
       <form className="signup-form" onSubmit={handleSubmit} noValidate>
         <div className="field">
           <label htmlFor="firstName">
-            First Name <span className="req">*</span>
+            First Name {star('firstName')}
           </label>
           <input
             id="firstName"
@@ -231,7 +239,7 @@ function SignUpForm({ onAuth }) {
 
         <div className="field">
           <label htmlFor="lastName">
-            Last Name <span className="req">*</span>
+            Last Name {star('lastName')}
           </label>
           <input
             id="lastName"
@@ -246,7 +254,7 @@ function SignUpForm({ onAuth }) {
 
         <div className="field">
           <label htmlFor="company">
-            Company Name <span className="req">*</span>
+            Company Name {star('company')}
           </label>
           <input
             id="company"
@@ -260,7 +268,7 @@ function SignUpForm({ onAuth }) {
         </div>
 
         <div className="field">
-          <label htmlFor="designation">Job Title</label>
+          <label htmlFor="designation">Job Title {star('designation')}</label>
           <input
             id="designation"
             value={form.designation}
@@ -274,7 +282,7 @@ function SignUpForm({ onAuth }) {
 
         <div className="field">
           <label htmlFor="email">
-            Business Email <span className="req">*</span>
+            Business Email {star('email')}
           </label>
           <input
             id="email"
@@ -322,7 +330,7 @@ function SignUpForm({ onAuth }) {
         </div>
 
         <div className="field">
-          <label htmlFor="state">State</label>
+          <label htmlFor="state">State {star('state')}</label>
           <SearchableSelect
             id="state"
             value={form.state}
@@ -336,7 +344,7 @@ function SignUpForm({ onAuth }) {
         </div>
 
         <div className="field">
-          <label htmlFor="industry">Industry</label>
+          <label htmlFor="industry">Industry {star('industry')}</label>
           <input
             id="industry"
             value={form.industry}
@@ -353,7 +361,7 @@ function SignUpForm({ onAuth }) {
             <input type="checkbox" checked={form.consent} onChange={update('consent')} />
             <span>
               I would like to be contacted by PIP Global Safety to discuss my specific requirements.{' '}
-              <span className="req">*</span>
+              {star('consent')}
             </span>
           </label>
           {errors.consent && <span className="error">{errors.consent}</span>}
@@ -363,15 +371,14 @@ function SignUpForm({ onAuth }) {
           <label className="consent-label">
             <input
               type="checkbox"
-              required
-              aria-invalid={Boolean(errors.marketingConsent)}
+              required={required.marketingConsent}              aria-invalid={Boolean(errors.marketingConsent)}
               checked={form.marketingConsent}
               onChange={update('marketingConsent')}
             />
             <span>
               By checking this box, you agree to receive marketing e-communications, including
               updates about our offering, special offers, news and events from PIP Global Safety.{' '}
-              <span className="req">*</span>
+              {star('marketingConsent')}
             </span>
           </label>
           {errors.marketingConsent && <span className="error">{errors.marketingConsent}</span>}

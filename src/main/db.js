@@ -587,13 +587,42 @@ export function createEvent(name) {
   return updateGameSettings({ event: stored.name })
 }
 
+// Sign-up fields the admin can mark required/optional. Mobile is the unique player key, so it is
+// always required and not listed here. Defaults match the original hard-coded form rules.
+const DEFAULT_REQUIRED_FIELDS = {
+  firstName: true,
+  lastName: true,
+  company: true,
+  designation: false,
+  email: true,
+  state: false,
+  industry: false,
+  consent: true,
+  marketingConsent: true
+}
+
+function parseRequiredFields(raw) {
+  let parsed = {}
+  try {
+    parsed = JSON.parse(raw || '{}') || {}
+  } catch {
+    // malformed value: fall back to the defaults
+  }
+  return Object.fromEntries(
+    Object.entries(DEFAULT_REQUIRED_FIELDS).map(([k, d]) => [
+      k,
+      typeof parsed[k] === 'boolean' ? parsed[k] : d
+    ])
+  )
+}
+
 export function getGameSettings() {
   const rows = db
     .prepare(
       `SELECT key, value FROM settings
        WHERE key IN
          ('active_scene', 'game_duration_seconds', 'active_event', 'random_scene', 'random_scenes',
-          'unlimited_wrong_taps')`
+          'unlimited_wrong_taps', 'required_fields')`
     )
     .all()
   const byKey = Object.fromEntries(rows.map((r) => [r.key, r.value]))
@@ -625,7 +654,16 @@ export function getGameSettings() {
     // Existing installs and malformed values retain the previous all-scenes behavior.
   }
   const unlimitedWrongTaps = byKey.unlimited_wrong_taps === '1'
-  return { scene, durationSeconds, activeEvent, randomScene, randomScenes, unlimitedWrongTaps }
+  const requiredFields = parseRequiredFields(byKey.required_fields)
+  return {
+    scene,
+    durationSeconds,
+    activeEvent,
+    randomScene,
+    randomScenes,
+    unlimitedWrongTaps,
+    requiredFields
+  }
 }
 
 // The scene and timer for the visitor who just signed up: the admin's chosen scene, or a random
@@ -649,7 +687,8 @@ export function updateGameSettings({
   event,
   randomScene,
   randomScenes,
-  unlimitedWrongTaps
+  unlimitedWrongTaps,
+  requiredFields
 }) {
   const current = getGameSettings()
   const parsedDuration = Number.parseInt(durationSeconds, 10)
@@ -671,7 +710,10 @@ export function updateGameSettings({
     randomScene: typeof randomScene === 'boolean' ? randomScene : current.randomScene,
     randomScenes: selectedScenes.length ? selectedScenes : current.randomScenes,
     unlimitedWrongTaps:
-      typeof unlimitedWrongTaps === 'boolean' ? unlimitedWrongTaps : current.unlimitedWrongTaps
+      typeof unlimitedWrongTaps === 'boolean' ? unlimitedWrongTaps : current.unlimitedWrongTaps,
+    requiredFields: parseRequiredFields(
+      JSON.stringify({ ...current.requiredFields, ...(requiredFields || {}) })
+    )
   }
   const upsert = db.prepare(
     `INSERT INTO settings (key, value) VALUES (@key, @value)
@@ -684,6 +726,7 @@ export function updateGameSettings({
     upsert.run({ key: 'random_scene', value: next.randomScene ? '1' : '0' })
     upsert.run({ key: 'random_scenes', value: JSON.stringify(next.randomScenes) })
     upsert.run({ key: 'unlimited_wrong_taps', value: next.unlimitedWrongTaps ? '1' : '0' })
+    upsert.run({ key: 'required_fields', value: JSON.stringify(next.requiredFields) })
   })()
   return next
 }

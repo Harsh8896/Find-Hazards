@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getLeaderboard, getLeaderboardSettings } from '../lib/leaderboard'
+import { dialCodeFromPhone } from '../data/countries'
 
 const REFRESH_MS = 3000
 
@@ -142,6 +143,7 @@ export default function Leaderboard({ currentPhone, onBack }) {
             <span>Company</span>
             <span>Event</span>
             <span>Email</span>
+            <span>Country Code</span>
             <span>Mobile</span>
             <span className="lb-num">Correct</span>
             <span className="lb-num">Wrong</span>
@@ -162,6 +164,7 @@ export default function Leaderboard({ currentPhone, onBack }) {
               {r.event || '—'}
             </span>
             <span className="lb-contact">{maskEmail(r.email)}</span>
+            <span className="lb-contact">{dialCodeFromPhone(r.phone) || '—'}</span>
             <span className="lb-contact">{maskPhone(r.phone)}</span>
             <span className="lb-num">{show(r.hazardsFound)}</span>
             <span className="lb-num">{show(r.wrongPicks)}</span>
