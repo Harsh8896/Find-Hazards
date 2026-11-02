@@ -7,7 +7,6 @@ export const SIGNUP_FIELDS = [
   { key: 'email', label: 'Business Email' },
   { key: 'state', label: 'State' },
   { key: 'industry', label: 'Industry' },
-  { key: 'consent', label: 'Contact Consent' },
   { key: 'marketingConsent', label: 'Marketing Consent' }
 ]
 

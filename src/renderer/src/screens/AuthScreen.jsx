@@ -3,7 +3,7 @@ import SearchableSelect from '../components/SearchableSelect'
 import { emailAlreadyPlayed, phoneAlreadyPlayed, signUp } from '../lib/auth'
 import { getLeaderboardSettings } from '../lib/leaderboard'
 import CountrySelect from '../components/CountrySelect'
-import { INDIAN_STATES } from '../data/indianStates'
+import STATES_BY_COUNTRY from '../data/statesByCountry.json'
 import { DEFAULT_COUNTRY, fullPhone } from '../data/countries'
 import { DEFAULT_REQUIRED_FIELDS } from '../data/signupFields'
 
@@ -65,7 +65,6 @@ function validate(form, req) {
   } else if (industry.length < 2) errs.industry = 'Industry must be at least 2 characters'
   else if (industry.length > 100) errs.industry = 'Industry must be under 100 characters'
 
-  if (req.consent && !form.consent) errs.consent = 'Please accept to continue'
   if (req.marketingConsent && !form.marketingConsent)
     errs.marketingConsent = 'Please accept this consent to continue'
   return errs
@@ -209,7 +208,7 @@ function SignUpForm({ onAuth, required }) {
         })
         return
       }
-      onAuth(await signUp({ ...form, phone }))
+      onAuth(await signUp({ ...form, phone, consent: form.marketingConsent }))
     } catch (err) {
       setErrors({ form: `Could not save your details: ${err.message}` })
     } finally {
@@ -307,6 +306,7 @@ function SignUpForm({ onAuth, required }) {
                 setForm((f) => ({
                   ...f,
                   country,
+                  state: country.iso === f.country.iso ? f.state : '',
                   phone: cleanPhone(f.phone, country)
                 }))
               }
@@ -331,15 +331,28 @@ function SignUpForm({ onAuth, required }) {
 
         <div className="field">
           <label htmlFor="state">State {star('state')}</label>
-          <SearchableSelect
-            id="state"
-            value={form.state}
-            onChange={(v) => setField('state', v)}
-            options={INDIAN_STATES}
-            placeholder="Select your state"
-            searchPlaceholder="Search states..."
-            ariaInvalid={Boolean(errors.state)}
-          />
+          {STATES_BY_COUNTRY[form.country.iso] ? (
+            <SearchableSelect
+              id="state"
+              // remount so the open/search state resets when the country changes
+              key={form.country.iso}
+              value={form.state}
+              onChange={(v) => setField('state', v)}
+              options={STATES_BY_COUNTRY[form.country.iso]}
+              placeholder="Select your state"
+              searchPlaceholder="Search states..."
+              ariaInvalid={Boolean(errors.state)}
+            />
+          ) : (
+            <input
+              id="state"
+              value={form.state}
+              onChange={update('state')}
+              placeholder="Your state / region"
+              maxLength={50}
+              aria-invalid={Boolean(errors.state)}
+            />
+          )}
           {errors.state && <span className="error">{errors.state}</span>}
         </div>
 
@@ -358,20 +371,10 @@ function SignUpForm({ onAuth, required }) {
 
         <div className="field field-wide field-consent">
           <label className="consent-label">
-            <input type="checkbox" checked={form.consent} onChange={update('consent')} />
-            <span>
-              I would like to be contacted by PIP Global Safety to discuss my specific requirements.{' '}
-              {star('consent')}
-            </span>
-          </label>
-          {errors.consent && <span className="error">{errors.consent}</span>}
-        </div>
-
-        <div className="field field-wide field-consent">
-          <label className="consent-label">
             <input
               type="checkbox"
-              required={required.marketingConsent}              aria-invalid={Boolean(errors.marketingConsent)}
+              required={required.marketingConsent}
+              aria-invalid={Boolean(errors.marketingConsent)}
               checked={form.marketingConsent}
               onChange={update('marketingConsent')}
             />
